@@ -28,6 +28,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.Shrine.TextInputLayout"
+            app:startIconDrawable="@drawable/ic_person_login"
+            app:helperTextEnabled="true"
+            app:errorEnabled="true"
+            app:helperText="Introduce tu nombre de usuario"
             android:hint="Username">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -43,6 +47,10 @@
             android:layout_height="wrap_content"
             android:id="@+id/password_input"
             style="@style/Widget.Shrine.TextInputLayout"
+            app:startIconDrawable="@drawable/ic_password"
+            app:endIconMode="password_toggle"
+            app:helperTextEnabled="true"
+            app:helperText="Introduce tu contraseña"
             android:hint="Password"
             app:errorEnabled="true">
 
@@ -64,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:text="Next"
+                android:text="Siguiente"
                 android:id="@+id/next_button_login" />
 
             <com.google.android.material.button.MaterialButton
@@ -76,7 +84,7 @@
                 android:layout_marginRight="12dp"
                 android:layout_toStartOf="@id/next_button_login"
                 android:layout_toLeftOf="@id/next_button_login"
-                android:text="Cancelar" />
+                android:text="Registrarse" />
 
         </RelativeLayout>
 

@@ -34,6 +34,9 @@
         style="@style/Widget.Shrine.TextInputLayout"
         android:id="@+id/input_name"
         android:hint="Nombre"
+        app:startIconDrawable="@drawable/ic_person"
+        app:helperTextEnabled="true"
+        app:helperText="Introduce el nombre del contacto"
         app:errorEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -42,6 +45,7 @@
             android:id="@+id/edit_name"
             android:inputType="text"
             android:maxLines="1"/>
+
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -49,6 +53,9 @@
         android:layout_height="wrap_content"
         style="@style/Widget.Shrine.TextInputLayout"
         android:id="@+id/input_number"
+        app:startIconDrawable="@drawable/ic_call"
+        app:helperTextEnabled="true"
+        app:helperText="Introduce el nombre del contacto"
         android:hint="Número"
         app:errorEnabled="true">
 
