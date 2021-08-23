@@ -39,6 +39,14 @@
         <item name="titleTextAppearance">@style/TextAppearance.Shrine.Toolbar</item>
     </style>
 
+    <style name="Widget.Shrine.ToolbarBottom" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">@color/bgbottomnav</item>
+        <item name="android:theme">@style/Theme.Shrine</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="titleTextAppearance">@style/TextAppearance.Shrine.Toolbar</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
     <style name="TextAppearance.Shrine.Toolbar" parent="TextAppearance.MaterialComponents.Button">
         <item name="android:textSize">16sp</item>
     </style>
@@ -52,5 +60,11 @@
     <style name="Widget.Shrine.Backdrop" parent="">
         <item name="android:background">?attr/colorAccent</item>
     </style>
+    <style name="Theme.Shrine.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="Theme.Shrine.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.Shrine.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>

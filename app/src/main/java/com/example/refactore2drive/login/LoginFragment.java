@@ -1,4 +1,4 @@
-package com.example.refactore2drive;
+package com.example.refactore2drive.login;
 
 import android.os.Bundle;
 
@@ -10,6 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.refactore2drive.obd.SelectOBD;
+import com.example.refactore2drive.NavigationHost;
+import com.example.refactore2drive.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -30,7 +33,7 @@ public class LoginFragment extends Fragment {
                 passwordInput.setError("Contraseña con minimo 8 caracteres");
             } else {
                 passwordInput.setError(null);
-                ((NavigationHost) getActivity()).navigateTo(new InfoGridFragment(), false);
+                ((NavigationHost) getActivity()).navigateTo(new SelectOBD(), false);
             }
 
         });
