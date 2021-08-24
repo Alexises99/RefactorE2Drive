@@ -3,6 +3,8 @@ package com.example.refactore2drive.heart;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.SharedPreferences;
+import android.database.CursorIndexOutOfBoundsException;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -10,6 +12,8 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +24,8 @@ import android.widget.TextView;
 import com.example.refactore2drive.NavigationHost;
 import com.example.refactore2drive.R;
 import com.example.refactore2drive.controlpanel.InfoGridFragment;
+import com.example.refactore2drive.database.DatabaseHelper;
+import com.example.refactore2drive.models.Device;
 
 import java.util.ArrayList;
 
@@ -28,11 +34,8 @@ public class SelectWear extends Fragment {
     private boolean mScanning;
     private BluetoothAdapter myAdapter;
     private DeviceListAdapter deviceListAdapter;
-
-
-
-    // TODO: Rename and change types and number of parameters
-
+    private  ListView listView;
+    private DatabaseHelper db;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,13 +54,18 @@ public class SelectWear extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_select_wear, container, false);
-        ListView listView = view.findViewById(R.id.wear_list);
+        listView = view.findViewById(R.id.wear_list);
         switchCompat = view.findViewById(R.id.wear_switch);
         deviceListAdapter = new DeviceListAdapter();
         listView.setAdapter(deviceListAdapter);
-        scanLeDevice(true);
+        db = new DatabaseHelper(getActivity());
         listView.setOnItemClickListener((adapterView, view1, i, l) -> {
             BluetoothDevice device = deviceListAdapter.getDevice(i);
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            final String username = preferences.getString("username", "No esta");
+            if (!username.equals("No esta")) {
+                db.createWear(new Device(device.getName(), device.getAddress(), username));
+            }
             if (mScanning) {
                 myAdapter.stopLeScan(mLeScanCallback);
                 mScanning = false;
@@ -66,7 +74,26 @@ public class SelectWear extends Fragment {
 
             getActivity().findViewById(R.id.bottom_navigation).setVisibility(View.VISIBLE);
         });
+
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        scanLeDevice(true);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        final String username = preferences.getString("username", "No esta");
+        if (!username.equals("No esta")) {
+            try {
+                Device device = db.getWear(username);
+                ((NavigationHost) getActivity()).navigateTo(InfoGridFragment.newInstance(device.getAddress()), false);
+                getActivity().findViewById(R.id.bottom_navigation).setVisibility(View.VISIBLE);
+            } catch (CursorIndexOutOfBoundsException e) {
+                Log.e("Error al recuperar wear", "error");
+            }
+        }
     }
 
     private void scanLeDevice(final boolean enable) {

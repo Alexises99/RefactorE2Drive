@@ -119,7 +119,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + TABLE_INJURY + " (" +
                     COLUMN_ID + " INTEGER PRIMARY KEY," +
                     COLUMN_INJURY_NAME + " TEXT NOT NULL," +
-                    COLUMN_INJURY_NICKNAME + " TEXT UNIQUE," +
+                    COLUMN_INJURY_NICKNAME + " TEXT," +
                     "FOREIGN KEY(" + COLUMN_INJURY_NICKNAME+") REFERENCES " + TABLE_PERSON +"("+ COLUMN_PERSON_NICKNAME+")" +
                     ")";
     private static final String SQL_CREATE_PERSON =

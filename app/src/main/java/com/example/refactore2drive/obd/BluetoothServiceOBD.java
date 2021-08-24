@@ -4,11 +4,17 @@ import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
+
 import androidx.annotation.Nullable;
-import com.example.refactore2drive.Helper;
+
+import com.example.refactore2drive.MainActivity;
+import com.example.refactore2drive.ToastUtils;
 import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
 import com.github.pires.obd.commands.engine.AbsoluteLoadCommand;
@@ -35,6 +41,7 @@ import com.github.pires.obd.commands.temperature.EngineCoolantTemperatureCommand
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
@@ -88,7 +95,7 @@ public class BluetoothServiceOBD extends Service {
      */
     private void checkBt(final String deviceAddress) {
         if (myAdapter ==  null) {
-            Helper.makeToast(getApplicationContext(),"Bluetooth no soportado");
+            ToastUtils.show(getApplicationContext(),"Bluetooth no soportado");
             stopSelf();
         } else {
             if (myAdapter.isEnabled()) {
@@ -98,11 +105,11 @@ public class BluetoothServiceOBD extends Service {
                     connectingThread.start();
                     Log.d("Conectando", "Conectando");
                 } catch (IllegalArgumentException e) {
-                    Helper.makeToast(getApplicationContext(), "Dirección MAC invalida");
+                    ToastUtils.show(getApplicationContext(), "Dirección MAC invalida");
                     stopSelf();
                 }
             } else {
-                Helper.makeToast(getApplicationContext(), "Bluetooth no esta encendido");
+                ToastUtils.show(getApplicationContext(), "Bluetooth no esta encendido");
                 stopSelf();
             }
         }
@@ -117,7 +124,7 @@ public class BluetoothServiceOBD extends Service {
             try {
                 temp = device.createRfcommSocketToServiceRecord(btUuid);
             } catch (IOException e) {
-                Helper.makeToast(getApplicationContext(), "Conexión con OBD fallida");
+                ToastUtils.show(getApplicationContext(), "Conexión con OBD fallida");
                 Intent intent = new Intent();
                 sendBroadcast(intent);
                 stopSelf();
@@ -140,12 +147,12 @@ public class BluetoothServiceOBD extends Service {
                     mySocket.close();
                     Intent intent = new Intent();
                     sendBroadcast(intent);
-                    Helper.makeToast(getApplicationContext(), "Conexión fallida con OBD");
+                    ToastUtils.show(getApplicationContext(), "Conexión fallida con OBD");
                     stopSelf();
                 } catch (IOException e2) {
                     Intent intent = new Intent();
                     sendBroadcast(intent);
-                    Helper.makeToast(getApplicationContext(), "Conexión con OBD cerrada");
+                    ToastUtils.show(getApplicationContext(), "Conexión con OBD cerrada");
                     stopSelf();
                 }
             }
@@ -155,7 +162,7 @@ public class BluetoothServiceOBD extends Service {
             try {
                 mySocket.close();
             } catch (IOException e) {
-                Helper.makeToast(getApplicationContext(), "Conexión con el OBD finalizada");
+                ToastUtils.show(getApplicationContext(), "Conexión con el OBD finalizada");
                 stopSelf();
             } finally {
                 Intent intent = new Intent();
@@ -179,7 +186,7 @@ public class BluetoothServiceOBD extends Service {
             } catch (IOException e) {
                 Intent intent = new Intent();
                 sendBroadcast(intent);
-                Helper.makeToast(getApplicationContext(), "Error en la transferencia con el OBD");
+                ToastUtils.show(getApplicationContext(), "Error en la transferencia con el OBD");
                 stopSelf();
             }
             myInputStream = tmpIn;
@@ -200,7 +207,7 @@ public class BluetoothServiceOBD extends Service {
             } catch (IOException e) {
                 stopSelf();
             } finally {
-                Helper.makeToast(getApplicationContext(), "Cerrando conexión con el OBD");
+                ToastUtils.show(getApplicationContext(), "Cerrando conexión con el OBD");
                 Intent intent = new Intent();
                 sendBroadcast(intent);
                 stopThreads();

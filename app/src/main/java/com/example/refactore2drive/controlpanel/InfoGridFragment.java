@@ -110,7 +110,6 @@ public class InfoGridFragment extends Fragment {
         heartReceiver.addAction(BluetoothLeService.EXTRA_DATA);
         bm.registerReceiver(onDataReceived, dataReceiver);
         bm.registerReceiver(mGattUpdateReceiver, heartReceiver);
-        Log.d("AAA", db.getPerson("alex").toString());
     }
     //OBD
     private BroadcastReceiver onDataReceived = new BroadcastReceiver() {

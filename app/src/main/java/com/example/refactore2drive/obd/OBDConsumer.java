@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import com.example.refactore2drive.ToastUtils;
 import com.github.pires.obd.enums.AvailableCommandNames;
 import com.github.pires.obd.exceptions.UnsupportedCommandException;
 import java.io.IOException;
@@ -99,6 +101,8 @@ public class OBDConsumer implements Runnable{
             cmdResult = job.getCommand().getResult();
         } else if (job.getState().equals(OBDCommandJob.ObdCommandJobState.BROKEN_PIPE)) {
             Log.e(TAG, "ERRORR BROKEN PIPE");
+            Thread.currentThread().interrupt();
+            ToastUtils.show(context, "OBD desconectado");
         } else if (job.getState().equals(OBDCommandJob.ObdCommandJobState.NOT_SUPPORTED)) {
             cmdResult = "Comando no soportado";
         } else {

@@ -1,66 +1,136 @@
 package com.example.refactore2drive.sessions;
 
+import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.refactore2drive.R;
+import com.example.refactore2drive.models.SessionModel;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputLayout;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SessionFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+
 public class SessionFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public SessionFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SessionFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SessionFragment newInstance(String param1, String param2) {
-        SessionFragment fragment = new SessionFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
+    private SessionListAdapter sessionListAdapter;
+    private ListView listSessions;
+    private MaterialButton startSession, endSession;
+    private SessionModel sessionModel;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_session, container, false);
+        View view = inflater.inflate(R.layout.fragment_session, container, false);
+        sessionListAdapter = new SessionListAdapter();
+        listSessions = view.findViewById(R.id.list_sessions);
+        listSessions.setAdapter(sessionListAdapter);
+        startSession = view.findViewById(R.id.start_session);
+        endSession = view.findViewById(R.id.end_session);
+        listeners();
+        return view;
+    }
+
+    private void listeners() {
+        startSession.setOnClickListener(view -> {
+            startSession.setEnabled(false);
+            endSession.setEnabled(true);
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String username = preferences.getString("username", "error");
+            String iniTime = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
+            sessionModel = new SessionModel();
+            sessionModel.setName("test"+iniTime+".csv");
+            sessionModel.settIni(iniTime);
+            sessionModel.setUsername(username);
+
+        });
+        endSession.setOnClickListener(view -> {
+            startSession.setEnabled(true);
+            endSession.setEnabled(false);
+            sessionModel.settFin(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+            sessionListAdapter.addSession(sessionModel);
+            sessionListAdapter.notifyDataSetChanged();
+        });
+    }
+
+
+    private class SessionListAdapter extends BaseAdapter {
+        private final ArrayList<SessionModel> mSessions;
+        private final LayoutInflater mInflator;
+
+        public SessionListAdapter() {
+            super();
+            mSessions = new ArrayList<>();
+            mInflator = getLayoutInflater();
+        }
+
+        public void addSession(SessionModel session) {
+            if(!mSessions.contains(session)) {
+                mSessions.add(session);
+            }
+        }
+
+        public SessionModel getSession(int position) {
+            return mSessions.get(position);
+        }
+        public void delete(int position) { mSessions.remove(position); }
+
+        public void clear() {
+            mSessions.clear();
+        }
+        @Override
+        public int getCount() {
+            return mSessions.size();
+        }
+        @Override
+        public Object getItem(int i) {
+            return mSessions.get(i);
+        }
+        @Override
+        public long getItemId(int i) {
+            return i;
+        }
+        @SuppressLint("InflateParams")
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            ViewHolder viewHolder;
+            if (view == null) {
+                view = mInflator.inflate(R.layout.list_item_session, null);
+                viewHolder = new ViewHolder();
+                viewHolder.nameSession = view.findViewById(R.id.name_session);
+                viewHolder.startHour = view.findViewById(R.id.start_hour);
+                viewHolder.endHour = view.findViewById(R.id.end_hour);
+                view.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) view.getTag();
+            }
+            SessionModel session = mSessions.get(i);
+            final String sessionName = session.getName();
+            if (sessionName != null && sessionName.length() > 0)
+                viewHolder.nameSession.setText(sessionName);
+            else
+                viewHolder.nameSession.setText("Sesion desconocida");
+            viewHolder.startHour.setText("Inicio: " + session.gettIni());
+            viewHolder.endHour.setText("Fin: " + session.gettFin());
+            return view;
+        }
+    }
+
+    static class ViewHolder {
+        TextView nameSession;
+        TextView startHour;
+        TextView endHour;
     }
 }

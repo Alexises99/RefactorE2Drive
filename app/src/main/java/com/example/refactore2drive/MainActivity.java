@@ -14,6 +14,7 @@ import com.example.refactore2drive.controlpanel.InfoGridFragment;
 import com.example.refactore2drive.database.DatabaseHelper;
 import com.example.refactore2drive.login.LoginFragment;
 import com.example.refactore2drive.models.Person;
+import com.example.refactore2drive.sessions.SessionFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity implements NavigationHost{
@@ -22,9 +23,6 @@ public class MainActivity extends AppCompatActivity implements NavigationHost{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        DatabaseHelper db = new DatabaseHelper(getApplicationContext());
-        Log.d("alex",db.getPerson("alex").toString());
-        db.closeDB();
         BottomNavigationView nav = findViewById(R.id.bottom_navigation);
         nav.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
@@ -37,6 +35,9 @@ public class MainActivity extends AppCompatActivity implements NavigationHost{
                 case R.id.page_3:
                     navigateTo(new ChartFragment(), false);
                     return true;
+                case R.id.page_4:
+                    navigateTo(new SessionFragment(), false);
+                    return  true;
                 default:
                     return false;
             }
@@ -49,6 +50,11 @@ public class MainActivity extends AppCompatActivity implements NavigationHost{
                     .commit();
         }
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 
     @Override

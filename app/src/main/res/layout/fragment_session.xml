@@ -14,6 +14,7 @@
         android:layout_gravity="center_horizontal">
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/start_session"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/Widget.Shrine.Button"
@@ -21,6 +22,7 @@
             android:layout_margin="8dp"
             android:text="Comenzar Sesión" />
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/end_session"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/Widget.Shrine.Button"
@@ -31,6 +33,7 @@
     </RelativeLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/comment_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/Widget.Shrine.TextInputLayout"
@@ -43,6 +46,7 @@
         android:hint="Comentarios" >
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/comment_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textLongMessage" />
@@ -56,6 +60,14 @@
         android:layout_marginTop="16dp"
         android:text="Historico de Sesiones"
         android:gravity="center"/>
+
+    <ListView
+        android:id="@+id/list_sessions"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        />
 
 
 </LinearLayout>
