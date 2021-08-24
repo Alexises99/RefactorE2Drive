@@ -174,8 +174,8 @@ public class SignupActivity extends AppCompatActivity {
                 if (correct) {
                     DatabaseHelper db = new DatabaseHelper(getApplicationContext());
                     //TODO Que no se pueda repetir el username.
-                    /*db.clearDB();
-                    db.initDB();*/
+                    db.clearDB();
+                    db.initDB();
                     try {
                         db.createPerson(new Person(nameEdit.getText().toString(), usernameEdit.getText().toString(), Integer.parseInt(ageEdit.getText().toString()), genre, Float.parseFloat(heightEdit.getText().toString())));
                         db.createAccount(new Account(usernameEdit.getText().toString(), passwordEdit.getText().toString()));

@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.refactore2drive.Helper;
+import com.example.refactore2drive.MainActivity;
 import com.example.refactore2drive.R;
 import com.example.refactore2drive.chart.Value;
 import com.example.refactore2drive.database.DatabaseHelper;
@@ -49,8 +50,6 @@ public class InfoGridFragment extends Fragment {
     InfoCardRecyclerViewAdapter adapter;
     private BluetoothLeService mBluetoothLeService;
     private BluetoothGattCharacteristic mNotifyCharacteristic;
-    private long prevConsume = -1;
-    private long prevSpeed = -1;
     private DatabaseHelper db;
 
     private static final String ARG_PARAM1 = "param1";
@@ -80,15 +79,8 @@ public class InfoGridFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        Intent gattServiceIntent = new Intent(getActivity(), BluetoothLeService.class);
-        getActivity().bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
+    public void onDetach() {
+        super.onDetach();
         bm.unregisterReceiver(onDataReceived);
         getActivity().unbindService(mServiceConnection);
     }
@@ -97,6 +89,8 @@ public class InfoGridFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         bm = LocalBroadcastManager.getInstance(context);
+        Intent gattServiceIntent = new Intent(getActivity(), BluetoothLeService.class);
+        getActivity().bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
         IntentFilter dataReceiver = new IntentFilter();
         IntentFilter heartReceiver = new IntentFilter();
         dataReceiver.addAction(OBDConsumer.ACTION_SEND_DATA_TEMP);
@@ -121,19 +115,19 @@ public class InfoGridFragment extends Fragment {
                 switch (action) {
                     case OBDConsumer.ACTION_SEND_DATA_CONSUME:
                         data = intent.getStringExtra("dataConsume");
+                        updateSingleItem(data, 3);
                         long res = 0;
                         if (data.length() == 6) res = (long) Float.parseFloat(data.substring(0,3).replace(",","."));
                         else if (data.length() == 7) res = (long) Float.parseFloat(data.substring(0,4).replace(",","."));
-                        if (prevConsume == -1){
-                            prevConsume = res;
+                        if (MainActivity.prevConsume == -1){
+                            MainActivity.prevConsume = res;
                             updateSingleItem(data, 3);
                             int x = Helper.formatTime(LocalTime.now());
                             Value value = new Value((long) x,(long) res, "alex", LocalDate.now().toString());
                             db.createDataConsume(value);
                         }
-                        else if (prevConsume != res) {
-                            prevConsume = res;
-                            updateSingleItem(data, 3);
+                        else if (MainActivity.prevConsume != res) {
+                            MainActivity.prevConsume = res;
                             int x = Helper.formatTime(LocalTime.now());
                             Value value = new Value((long) x,(long) res, "alex", LocalDate.now().toString());
                             db.createDataConsume(value);
@@ -145,27 +139,25 @@ public class InfoGridFragment extends Fragment {
                         break;
                     case OBDConsumer.ACTION_SEND_DATA_SPEED:
                         data = intent.getStringExtra("dataSpeed");
+                        updateSingleItem(data, 0);
                         long res1 = 0;
                         if (data.length() == 7) res1 = Long.parseLong(data.substring(0,3));
                         else if (data.length() == 6) res1 = Long.parseLong(data.substring(0,2));
                         else if (data.length() == 5) res1 = Long.parseLong(data.substring(0,1));
-                        if (prevSpeed == -1) {
-                            prevSpeed = res1;
-                            updateSingleItem(data, 0);
+                        if (MainActivity.prevSpeed == -1) {
+                            MainActivity.prevSpeed = res1;
+                            Log.d("Valor", "val"+MainActivity.prevSpeed);
                             int x1 = Helper.formatTime(LocalTime.now());
                             Value value1 = new Value((long) x1, (long) res1, "alex", LocalDate.now().toString());
                             db.createDataSpeed(value1);
                         }
-                        else if (prevSpeed != res1) {
-                            prevSpeed = res1;
-                            updateSingleItem(data, 0);
+                        else if (MainActivity.prevSpeed != res1) {
+                            MainActivity.prevSpeed = res1;
                             int x1 = Helper.formatTime(LocalTime.now());
                             Value value1 = new Value((long) x1, (long) res1, "alex", LocalDate.now().toString());
+                            Log.d("Valor", "valor: " + value1.getY());
                             db.createDataSpeed(value1);
                         }
-                        break;
-                    case OBDConsumer.ACTION_SEND_DATA_FUEL:
-                        data = intent.getStringExtra("dataFuel");
                         break;
                 }
             }
@@ -278,4 +270,5 @@ public class InfoGridFragment extends Fragment {
         inflater.inflate(R.menu.menu_toolbar, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
+
 }

@@ -1,16 +1,21 @@
 package com.example.refactore2drive.chart;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.refactore2drive.R;
@@ -26,6 +31,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +40,8 @@ import java.util.List;
 public class ChartFragment extends Fragment {
     private DatabaseHelper db;
     private HashMap<Integer, String> quarters;
+    private LineChart chart;
+    private EditText date;
 
     private void populate() {
         quarters = new HashMap<>();
@@ -86,10 +94,42 @@ public class ChartFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        populate();
+        ArrayList<Value> values = new ArrayList<>(getDataConsume());
+        ArrayList<Entry> list = process(values);
+        ArrayList<Value> values1 = new ArrayList<>(getDataSpeed());
+        ArrayList<Entry> list1 = process(values1);
+        LineDataSet lineDataSet = new LineDataSet(list, "Consumo");
+        LineDataSet lineDataSet1 = new LineDataSet(list1, "Velocidad");
+        configureLine(lineDataSet, 76, 146, 177);
+        configureLine(lineDataSet1, 228,142,88);
+        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+        //dataSets.add(lineDataSet);
+        dataSets.add(lineDataSet1);
+        LineData data = new LineData(dataSets);
+        ValueFormatter formatter = new ValueFormatter() {
+            @Override
+            public String getAxisLabel(float value, AxisBase axis) {
+                return quarters.get((int) value);
+            }
+        };
+        XAxis xAxis = chart.getXAxis();
+        YAxis yAxisLeft = chart.getAxisLeft();
+        YAxis yAxisRight = chart.getAxisRight();
+        configureAxis(xAxis, yAxisLeft, yAxisRight, formatter);
+        Legend legend = chart.getLegend();
+        configureLegend(legend);
+        chart.setData(data);
+        chart.invalidate();
+    }
+
+    @Override
     public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
         db = new DatabaseHelper(activity);
-        populate();
+
     }
 
     @Override
@@ -112,33 +152,26 @@ public class ChartFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_chart, container, false);
-        LineChart chart = view.findViewById(R.id.chart);
-        ArrayList<Value> values = new ArrayList<>(getDataConsume());
-        ArrayList<Entry> list = process(values);
-        ArrayList<Value> values1 = new ArrayList<>(getDataSpeed());
-        ArrayList<Entry> list1 = process(values1);
-        LineDataSet lineDataSet = new LineDataSet(list, "Consumo");
-        LineDataSet lineDataSet1 = new LineDataSet(list1, "Velocidad");
-        configureLine(lineDataSet, 76, 146, 177);
-        configureLine(lineDataSet1, 228,142,88);
-        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
-        dataSets.add(lineDataSet);
-        dataSets.add(lineDataSet1);
-        LineData data = new LineData(dataSets);
-        ValueFormatter formatter = new ValueFormatter() {
-            @Override
-            public String getAxisLabel(float value, AxisBase axis) {
-                return quarters.get((int) value);
-            }
-        };
-        XAxis xAxis = chart.getXAxis();
-        YAxis yAxisLeft = chart.getAxisLeft();
-        YAxis yAxisRight = chart.getAxisRight();
-        configureAxis(xAxis, yAxisLeft, yAxisRight, formatter);
-        Legend legend = chart.getLegend();
-        configureLegend(legend);
-        chart.setData(data);
-        chart.invalidate();
+        chart = view.findViewById(R.id.chart);
+        date = view.findViewById(R.id.chartDateEdit);
+        date.setOnClickListener(view1 -> showDatePickerDialog());
         return  view;
+    }
+
+    private String twoDigits(int n) {
+        return (n<=9) ? ("0"+n) : String.valueOf(n);
+    }
+
+    private void showDatePickerDialog() {
+        DatePickerFragment newFragment = DatePickerFragment.newInstance(new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                final String selectedDate = year + "-" + twoDigits(month+1) + "-" + twoDigits(day);
+                date.setText(selectedDate);
+                Log.d("Ahora", LocalDate.now().toString());
+                Log.d("Igual", "Iguales: " + selectedDate.trim().equals(LocalDate.now().toString().trim()));
+            }
+        });
+        newFragment.show(getActivity().getSupportFragmentManager(),"datePicker");
     }
 }
