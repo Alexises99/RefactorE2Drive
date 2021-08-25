@@ -55,9 +55,7 @@ public class SelectOBD extends Fragment {
         listView.setAdapter(deviceListAdapter);
         listView.setOnItemClickListener((parent, view1, position, id) -> {
             BluetoothDevice device = deviceListAdapter.getDevice(position);
-            if (!username.equals("No encontrado")) {
-                db.createObd(new Device(device.getName(), device.getAddress(), username));
-            }
+            db.createObd(new Device(device.getName(), device.getAddress(), username));
             ((NavigationHost) getActivity()).navigateTo(new SelectWear(), false);
         });
         return view;
@@ -68,6 +66,7 @@ public class SelectOBD extends Fragment {
         super.onStart();
         BluetoothAdapter myAdapter = BluetoothAdapter.getDefaultAdapter();
         try {
+            db.getObd(username);
             ((NavigationHost) getActivity()).navigateTo(new SelectWear(), false);
         } catch (CursorIndexOutOfBoundsException e) {
             Log.e("dispositivo no guardado", "no guardado");

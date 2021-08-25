@@ -35,6 +35,7 @@ import com.example.refactore2drive.database.DatabaseHelper;
 import com.example.refactore2drive.heart.BluetoothLeService;
 import com.example.refactore2drive.obd.BluetoothServiceOBD;
 import com.example.refactore2drive.obd.OBDConsumer;
+import com.example.refactore2drive.sessions.SessionFragment;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -52,6 +53,7 @@ public class InfoGridFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private String mParam1;
     private String username;
+    private boolean sessionStarted;
 
     public static InfoGridFragment newInstance(String param1) {
         InfoGridFragment fragment = new InfoGridFragment();
@@ -64,6 +66,7 @@ public class InfoGridFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("Holis", "aki etoy");
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             Log.d("PARAM", mParam1);
@@ -105,7 +108,7 @@ public class InfoGridFragment extends Fragment {
         }catch (NullPointerException e) {
             Log.e("error", "error no esperado");
         } finally {
-            getActivity().stopService(new Intent(getActivity(), BluetoothServiceOBD.class));
+            if (!sessionStarted && !BluetoothServiceOBD.isRunning) getActivity().stopService(new Intent(getActivity(), BluetoothServiceOBD.class));
             bm.unregisterReceiver(onDataReceived);
             bm.unregisterReceiver(onStatusReceiver);
             bm.unregisterReceiver(mGattUpdateReceiver);
@@ -135,9 +138,11 @@ public class InfoGridFragment extends Fragment {
         bm.registerReceiver(onStatusReceiver,status);
         bm.registerReceiver(onDataReceived, dataReceiver);
         bm.registerReceiver(mGattUpdateReceiver, heartReceiver);
-        Intent intent = new Intent(getActivity(), BluetoothServiceOBD.class);
-        intent.putExtra("deviceAddress",db.getObd(username).getAddress());
-        getActivity().startService(intent);
+        if (!BluetoothServiceOBD.isRunning) {
+            Intent intent = new Intent(getActivity(), BluetoothServiceOBD.class);
+            intent.putExtra("deviceAddress",db.getObd(username).getAddress());
+            getActivity().startService(intent);
+        }
     }
 
     private IntentFilter startFilterObd() {
@@ -165,6 +170,8 @@ public class InfoGridFragment extends Fragment {
         status.addAction(BluetoothServiceOBD.ACTION_CONNECTION_CONNECTED);
         status.addAction(BluetoothServiceOBD.ACTION_CONNECTION_CONNECTING);
         status.addAction(OBDConsumer.ACTION_DISCONNECTED);
+        status.addAction(SessionFragment.ACTION_SESSION_START);
+        status.addAction(SessionFragment.ACTION_SESSION_END);
         return status;
     }
 
@@ -177,6 +184,7 @@ public class InfoGridFragment extends Fragment {
                 switch (action) {
                     case OBDConsumer.ACTION_DISCONNECTED:
                         statusText.setText("Desconectado");
+                        getActivity().stopService(new Intent(getActivity(), BluetoothServiceOBD.class));
                         break;
                     case BluetoothServiceOBD.ACTION_CONNECTION_CONNECTED:
                         statusText.setText("Conectado");
@@ -186,6 +194,12 @@ public class InfoGridFragment extends Fragment {
                         break;
                     case BluetoothServiceOBD.ACTION_CONNECTION_FAILED:
                         statusText.setText("Conexión Fallida");
+                        break;
+                    case SessionFragment.ACTION_SESSION_START:
+                        sessionStarted = true;
+                        break;
+                    case SessionFragment.ACTION_SESSION_END:
+                        sessionStarted = false;
                         break;
                 }
             }

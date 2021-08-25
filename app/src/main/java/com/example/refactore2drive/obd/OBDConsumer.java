@@ -6,28 +6,40 @@ import android.os.Bundle;
 import android.util.Log;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.example.refactore2drive.ToastUtils;
+import com.example.refactore2drive.Helper;
+import com.example.refactore2drive.sessions.Headers;
 import com.github.pires.obd.enums.AvailableCommandNames;
 import com.github.pires.obd.exceptions.UnsupportedCommandException;
 import java.io.IOException;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 
 public class OBDConsumer implements Runnable{
     private BlockingQueue<OBDCommandJob> queue;
     private boolean isConnected;
     private Context context;
-
+    public final static String ACTION_SEND_DATA_OBD_SESSION = "com.example_ACTION_SEND_DATA_OBD_SESSION";
     public final static String ACTION_SEND_DATA_TEMP="ACTION_OBD_DATA_TEMP";
     public final static String ACTION_SEND_DATA_SPEED="ACTION_OBD_DATA_SPEED";
     public final static String ACTION_SEND_DATA_CONSUME="ACTION_OBD_DATA_CONSUME";
     public final static String ACTION_SEND_DATA_FUEL="ACTION_OBD_DATA_FUEL";
     public final static String ACTION_DISCONNECTED="com.example_ACTION_DISCONNECTED";
     private final static String TAG = OBDConsumer.class.getName();
+    private HashMap<String, String> commandResults;
+    private HashMap<String, String> filter;
+    private ArrayList<String> collectedData;
 
     public OBDConsumer(BlockingQueue<OBDCommandJob> queue,Context context) {
         this.queue = queue;
         isConnected = true;
         this.context = context;
+        commandResults = new HashMap<>();
+        filter = Helper.initFilter();
+        collectedData = new ArrayList<>();
     }
 
     @Override
@@ -104,6 +116,7 @@ public class OBDConsumer implements Runnable{
         } else if (job.getState().equals(OBDCommandJob.ObdCommandJobState.BROKEN_PIPE)) {
             Log.e(TAG, "ERRORR BROKEN PIPE");
             Intent intent = new Intent(ACTION_DISCONNECTED);
+            BluetoothServiceOBD.isRunning = false;
             LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
             Thread.currentThread().interrupt();
         } else if (job.getState().equals(OBDCommandJob.ObdCommandJobState.NOT_SUPPORTED)) {
@@ -124,6 +137,54 @@ public class OBDConsumer implements Runnable{
             case "FUEL_CONSUMPTION_RATE":
                 notifyFragment(cmdResult, ACTION_SEND_DATA_CONSUME, "dataConsume");
                 break;
+        }
+        commandResults.put(cmdName, cmdResult);
+        if (commandResults.size() >= Headers.headers.length) {
+            (new Thread() {
+                @Override
+                public void run() {
+                    processCollectedData();
+                }
+            }).start();
+        }
+    }
+
+    private void processCollectedData() {
+        String[] results = new String[Headers.headers.length + 1];
+        results[0] = LocalDateTime.now().toString();
+        int i = 1;
+        for (String header : Headers.headers) {
+            String unit = filter.get(header);
+            String value = commandResults.get(header);
+            try {
+                value = value.replace(unit, "");
+                value = value.replace(",", ".");
+                results[i] = value;
+                i++;
+            } catch (NullPointerException e) {
+                results[i] = "";
+                i++;
+            }
+        }
+        Arrays.stream(results).forEach(value -> collectedData.add(value));
+        if(collectedData.size() > 25) {
+            Log.d("Colectado", collectedData.toString());
+            Intent intent = new Intent(ACTION_SEND_DATA_OBD_SESSION);
+            intent.putExtra("collectedData", collectedData);
+            intent.putExtra("hola", collectedData);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+            collectedData.clear();
+        }
+    }
+
+    public class Data implements Serializable{
+        String data;
+        public Data(String data) {
+            this.data = data;
+        }
+
+        public String getData() {
+            return data;
         }
     }
 }

@@ -56,7 +56,8 @@ public class BluetoothServiceOBD extends Service {
     private Thread producer;
     private ConnectedThread connectedThread;
     private ConnectingThread connectingThread;
-    private Thread[] consumers = new Thread[2];
+    private Thread consumer;
+    public static boolean isRunning;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -83,8 +84,10 @@ public class BluetoothServiceOBD extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "Servicio OBD levantado");
         String deviceName = intent.getStringExtra("deviceAddress");
+        isRunning = true;
         checkBt(deviceName);
         return super.onStartCommand(intent, flags, startId);
+
     }
 
     /**
@@ -104,10 +107,12 @@ public class BluetoothServiceOBD extends Service {
                     Log.d("Conectando", "Conectando");
                 } catch (IllegalArgumentException e) {
                     ToastUtils.show(getApplicationContext(), "Dirección MAC invalida");
+                    isRunning = false;
                     stopSelf();
                 }
             } else {
                 ToastUtils.show(getApplicationContext(), "Bluetooth no esta encendido");
+                isRunning = false;
                 stopSelf();
             }
         }
@@ -125,10 +130,12 @@ public class BluetoothServiceOBD extends Service {
                 ToastUtils.show(getApplicationContext(), "Conexión con OBD fallida");
                 Intent intent = new Intent(ACTION_CONNECTION_FAILED);
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                isRunning = false;
                 stopSelf();
             }
             Intent intent = new Intent(ACTION_CONNECTION_CONNECTING);
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+            isRunning = false;
             mySocket = temp;
         }
 
@@ -146,11 +153,13 @@ public class BluetoothServiceOBD extends Service {
                     Intent intent = new Intent(ACTION_CONNECTION_FAILED);
                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                     ToastUtils.show(getApplicationContext(), "Conexión fallida con OBD");
+                    isRunning = false;
                     stopSelf();
                 } catch (IOException e2) {
                     Intent intent = new Intent(ACTION_CONNECTION_FAILED);
                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                     ToastUtils.show(getApplicationContext(), "Conexión con OBD cerrada");
+                    isRunning = false;
                     stopSelf();
                 }
             }
@@ -161,10 +170,12 @@ public class BluetoothServiceOBD extends Service {
                 mySocket.close();
             } catch (IOException e) {
                 ToastUtils.show(getApplicationContext(), "Conexión con el OBD finalizada");
+                isRunning = false;
                 stopSelf();
             } finally {
                 Intent intent = new Intent();
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+
                 stopThreads();
             }
         }
@@ -186,6 +197,7 @@ public class BluetoothServiceOBD extends Service {
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                 ToastUtils.show(getApplicationContext(), "Error en la transferencia con el OBD");
                 closeStreams();
+                isRunning = false;
                 stopSelf();
             }
             startThreads();
@@ -198,6 +210,7 @@ public class BluetoothServiceOBD extends Service {
                 inputStream.close();
                 outputStream.close();
             } catch (IOException e) {
+                isRunning = false;
                 stopSelf();
             } finally {
                 ToastUtils.show(getApplicationContext(), "Cerrando conexión con el OBD");
@@ -236,18 +249,15 @@ public class BluetoothServiceOBD extends Service {
         initializeList();
         producer = new Thread(new OBDProducer(jobsQueue,obdCommands));
         producer.start();
-        for (int i = 0; i < consumers.length; i++) {
-            consumers[i] = new Thread(new OBDConsumer(jobsQueue, getApplicationContext()));
-        }
-
-        for (Thread consumer: consumers) consumer.start();
+        consumer = new Thread(new OBDConsumer(jobsQueue, getApplicationContext()));
+        consumer.start();
         Log.d(TAG, "THREADS CREADOS");
     }
 
     private void stopThreads() {
         try {
             producer.interrupt();
-            for (Thread consumer : consumers) consumer.interrupt();
+            consumer.interrupt();
         } catch (NullPointerException e) {
             Log.e(TAG, "Threads no parados");
         }

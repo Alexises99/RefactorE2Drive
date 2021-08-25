@@ -56,7 +56,7 @@ public class Helper {
         filter.put("Fuel Rail Pressure", "kPa");
         filter.put("Fuel Pressure", "kPa");
         filter.put("Short Term Fuel Trim Bank 1", "%");
-        return initFilter();
+        return filter;
     }
 
     public static String getUsername(Context context) {

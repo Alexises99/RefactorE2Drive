@@ -17,8 +17,6 @@ import com.example.refactore2drive.sessions.SessionFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity implements NavigationHost{
-    public static final String ACTION_SEND_DATA_HEART = "com.example_ACTION_SEND_DATA_HEART";
-    public static final String ACTION_SEND_DATA_ODB = "com.example_ACTION_SEND_DATA_ODB";
     public static long prevSpeed = -1;
     public static long prevConsume = -1;
 
