@@ -1,23 +1,20 @@
 package com.example.refactore2drive.chart;
 
-import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.TextView;
 
+import android.widget.EditText;
+
+import com.example.refactore2drive.Helper;
 import com.example.refactore2drive.R;
 import com.example.refactore2drive.database.DatabaseHelper;
 import com.github.mikephil.charting.charts.LineChart;
@@ -42,6 +39,7 @@ public class ChartFragment extends Fragment {
     private HashMap<Integer, String> quarters;
     private LineChart chart;
     private EditText date;
+    private String username;
 
     private void populate() {
         quarters = new HashMap<>();
@@ -85,22 +83,60 @@ public class ChartFragment extends Fragment {
         lineDataSet.setValueTextSize(10);
     }
 
-    private List<Value> getDataConsume() {
-        return db.getDataConsume("alex");
+    private List<Value> getDataConsume(LocalDate date) {
+        return db.getDataConsumeByDate(username, date.toString());
     }
 
-    private List<Value> getDataSpeed() {
-        return db.getDataSpeed("alex");
+    private List<Value> getDataSpeed(LocalDate date) {
+        return db.getDataSpeedByDate(username, date.toString());
     }
 
     @Override
     public void onResume() {
         super.onResume();
         populate();
-        ArrayList<Value> values = new ArrayList<>(getDataConsume());
+        drawChart(LocalDate.now());
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        db = new DatabaseHelper(context);
+        username = Helper.getUsername(getActivity());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        db.closeDB();
+    }
+
+    private void configureLegend(Legend legend) {
+        legend.setFormSize(10f);
+        legend.setForm(Legend.LegendForm.CIRCLE);
+        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        legend.setTextSize(12f);
+        legend.setXEntrySpace(5f);
+        legend.setYEntrySpace(5f);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_chart, container, false);
+        chart = view.findViewById(R.id.chart);
+        date = view.findViewById(R.id.chartDateEdit);
+        date.setOnClickListener(view1 -> showDatePickerDialog());
+        return  view;
+    }
+
+    private void drawChart(LocalDate date) {
+        ArrayList<Value> values = new ArrayList<>(getDataConsume(date));
         ArrayList<Entry> list = process(values);
-        ArrayList<Value> values1 = new ArrayList<>(getDataSpeed());
+        ArrayList<Value> values1 = new ArrayList<>(getDataSpeed(date));
+        Log.d("Lista1", values1.toString());
         ArrayList<Entry> list1 = process(values1);
+        Log.d("process1", list1.toString());
         LineDataSet lineDataSet = new LineDataSet(list, "Consumo");
         LineDataSet lineDataSet1 = new LineDataSet(list1, "Velocidad");
         configureLine(lineDataSet, 76, 146, 177);
@@ -125,52 +161,18 @@ public class ChartFragment extends Fragment {
         chart.invalidate();
     }
 
-    @Override
-    public void onAttach(@NonNull Activity activity) {
-        super.onAttach(activity);
-        db = new DatabaseHelper(activity);
-
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        db.closeDB();
-    }
-
-    private void configureLegend(Legend legend) {
-        legend.setFormSize(10f);
-        legend.setForm(Legend.LegendForm.CIRCLE);
-        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
-        legend.setTextSize(12f);
-        legend.setXEntrySpace(5f);
-        legend.setYEntrySpace(5f);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_chart, container, false);
-        chart = view.findViewById(R.id.chart);
-        date = view.findViewById(R.id.chartDateEdit);
-        date.setOnClickListener(view1 -> showDatePickerDialog());
-        return  view;
-    }
-
     private String twoDigits(int n) {
         return (n<=9) ? ("0"+n) : String.valueOf(n);
     }
 
     private void showDatePickerDialog() {
-        DatePickerFragment newFragment = DatePickerFragment.newInstance(new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                final String selectedDate = year + "-" + twoDigits(month+1) + "-" + twoDigits(day);
-                date.setText(selectedDate);
-                Log.d("Ahora", LocalDate.now().toString());
-                Log.d("Igual", "Iguales: " + selectedDate.trim().equals(LocalDate.now().toString().trim()));
-            }
+        DatePickerFragment newFragment = DatePickerFragment.newInstance((datePicker, year, month, day) -> {
+            final String selectedDate = year + "-" + twoDigits(month+1) + "-" + twoDigits(day);
+            date.setText(selectedDate);
+            Log.d("Parse", LocalDate.of(year,month,day).toString());
+            Log.d("Actual", LocalDate.now().toString());
+            Log.d("Igual", "Iguales: " + selectedDate.trim().equals(LocalDate.now().toString().trim()));
+            drawChart(LocalDate.of(year,month+1,day));
         });
         newFragment.show(getActivity().getSupportFragmentManager(),"datePicker");
     }

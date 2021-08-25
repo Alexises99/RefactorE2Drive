@@ -1,10 +1,7 @@
 package com.example.refactore2drive.login;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
 import android.text.Editable;
@@ -14,14 +11,12 @@ import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.example.refactore2drive.NavigationHost;
 import com.example.refactore2drive.R;
 import com.example.refactore2drive.database.DatabaseHelper;
 import com.example.refactore2drive.models.Account;
 import com.example.refactore2drive.models.Discapacity;
 import com.example.refactore2drive.models.Disease;
 import com.example.refactore2drive.models.Person;
-import com.example.refactore2drive.obd.SelectOBD;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.radiobutton.MaterialRadioButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -35,7 +30,6 @@ public class SignupActivity extends AppCompatActivity {
     private TextInputEditText diseaseEdit, usernameEdit, passwordEdit, nameEdit, ageEdit;
     private TextInputEditText heightEdit, weightEdit, typeEdit, degreeEdit;
     private ArrayAdapter<String> arrayAdapter;
-    private MaterialRadioButton maleButton, femaleButton, otherButton;
     private RadioGroup radioGroup;
 
     @Override
@@ -174,8 +168,6 @@ public class SignupActivity extends AppCompatActivity {
                 if (correct) {
                     DatabaseHelper db = new DatabaseHelper(getApplicationContext());
                     //TODO Que no se pueda repetir el username.
-                    db.clearDB();
-                    db.initDB();
                     try {
                         db.createPerson(new Person(nameEdit.getText().toString(), usernameEdit.getText().toString(), Integer.parseInt(ageEdit.getText().toString()), genre, Float.parseFloat(heightEdit.getText().toString())));
                         db.createAccount(new Account(usernameEdit.getText().toString(), passwordEdit.getText().toString()));

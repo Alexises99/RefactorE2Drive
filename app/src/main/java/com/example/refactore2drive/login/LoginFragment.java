@@ -37,9 +37,7 @@ public class LoginFragment extends Fragment {
         MaterialButton nextButton = view.findViewById(R.id.next_button_login);
         MaterialButton regButton = view.findViewById(R.id.cancel_button_login);
 
-        regButton.setOnClickListener(view1 -> {
-            startActivity(new Intent(getActivity(), SignupActivity.class));
-        });
+        regButton.setOnClickListener(view1 -> startActivity(new Intent(getActivity(), SignupActivity.class)));
 
         nextButton.setOnClickListener(view1 -> {
             if (! (usernameEdit.getText().length() > 0 && usernameEdit.getText() != null)) {
@@ -59,7 +57,7 @@ public class LoginFragment extends Fragment {
                         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
                         SharedPreferences.Editor editor = preferences.edit();
                         editor.putString("username", usernameEdit.getText().toString());
-                        editor.commit();
+                        editor.apply();
                         ((NavigationHost) getActivity()).navigateTo(new SelectOBD(), false);
                     }
                 } catch (CursorIndexOutOfBoundsException e) {

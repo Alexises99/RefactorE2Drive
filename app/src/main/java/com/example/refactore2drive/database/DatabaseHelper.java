@@ -605,7 +605,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<Value> getDataSpeedByDate(String nickname, String date) {
         ArrayList<Value> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_DATA_SPEED + " WHERE " + COLUMN_DATA_NICKNAME + " = '" + nickname + "' AND " + COLUMN_DATA_DATE + "'" + date + "'";
+        String query = "SELECT * FROM " + TABLE_DATA_SPEED + " WHERE " + COLUMN_DATA_NICKNAME + " = '" + nickname + "' AND " + COLUMN_DATA_DATE + " = '" + date + "'";
         Log.e(LOG, query);
         Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {
@@ -626,7 +626,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<Value> getDataHeartByDate(String nickname, String date) {
         ArrayList<Value> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_DATA_HEART + " WHERE " + COLUMN_DATA_NICKNAME + " = '" + nickname + "' AND " + COLUMN_DATA_DATE + "'" + date + "'";
+        String query = "SELECT * FROM " + TABLE_DATA_HEART + " WHERE " + COLUMN_DATA_NICKNAME + " = '" + nickname + "' AND " + COLUMN_DATA_DATE + " = '" + date + "'";
         Log.e(LOG, query);
         Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {
@@ -647,7 +647,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<Value> getDataConsumeByDate(String nickname, String date) {
         ArrayList<Value> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_DATA_CONSUME + " WHERE " + COLUMN_DATA_NICKNAME + " = '" + nickname + "' AND " + COLUMN_DATA_DATE + "'" + date + "'";
+        String query = "SELECT * FROM " + TABLE_DATA_CONSUME + " WHERE " + COLUMN_DATA_NICKNAME + " = '" + nickname + "' AND " + COLUMN_DATA_DATE + " = '" + date + "'";
         Log.e(LOG, query);
         Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {

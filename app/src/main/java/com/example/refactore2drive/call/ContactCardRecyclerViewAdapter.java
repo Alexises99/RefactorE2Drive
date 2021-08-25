@@ -8,8 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.refactore2drive.R;
-import com.example.refactore2drive.controlpanel.InfoCardViewHolder;
-import com.example.refactore2drive.controlpanel.InfoEntry;
 
 import java.util.List;
 

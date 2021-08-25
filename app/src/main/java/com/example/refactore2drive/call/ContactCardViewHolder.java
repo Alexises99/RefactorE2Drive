@@ -1,24 +1,14 @@
 package com.example.refactore2drive.call;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.refactore2drive.MainActivity;
 import com.example.refactore2drive.R;
 
 public class ContactCardViewHolder extends RecyclerView.ViewHolder {
@@ -27,7 +17,6 @@ public class ContactCardViewHolder extends RecyclerView.ViewHolder {
     public ImageView icon;
     public Button button;
 
-    public static int REQUEST_CALL=1;
 
     public ContactCardViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -41,12 +30,7 @@ public class ContactCardViewHolder extends RecyclerView.ViewHolder {
         name.setText(contactEntry.name);
         number.setText(contactEntry.number);
         icon.setImageResource(contactEntry.resourceId);
-        itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                listener.onItemClick(contactEntry);
-            }
-        });
+        itemView.setOnClickListener(view -> listener.onItemClick(contactEntry));
     }
 
 

@@ -40,7 +40,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="text"
-                android:maxLines="1" />
+                android:maxLines="1"
+                android:text="ubuntin"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -60,7 +61,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/password_edit"
-                android:inputType="textPassword"/>
+                android:inputType="textPassword"
+                android:text="12345678"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 

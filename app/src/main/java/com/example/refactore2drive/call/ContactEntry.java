@@ -1,10 +1,6 @@
 package com.example.refactore2drive.call;
 
 import com.example.refactore2drive.R;
-import com.example.refactore2drive.controlpanel.InfoEntry;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ContactEntry {
     public String name;

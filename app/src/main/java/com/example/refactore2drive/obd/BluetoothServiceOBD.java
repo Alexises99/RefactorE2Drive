@@ -4,16 +4,13 @@ import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.example.refactore2drive.MainActivity;
 import com.example.refactore2drive.ToastUtils;
 import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
@@ -41,7 +38,6 @@ import com.github.pires.obd.commands.temperature.EngineCoolantTemperatureCommand
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
@@ -49,7 +45,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 public class BluetoothServiceOBD extends Service {
     public static final String TAG = BluetoothServiceOBD.class.getName();
-
+    public static final String ACTION_CONNECTION_FAILED = "com.example_CONNECTION_FAILED";
+    public static final String ACTION_CONNECTION_CONNECTING = "com.example_CONNECTION_CONNECTING";
+    public static final String ACTION_CONNECTION_CONNECTED = "com.example_CONNECTION_CONNECTED";
     private static final UUID btUuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private final ArrayList<ObdCommand> obdCommands = new ArrayList<>();
     static InputStream inputStream;
@@ -125,12 +123,12 @@ public class BluetoothServiceOBD extends Service {
                 temp = device.createRfcommSocketToServiceRecord(btUuid);
             } catch (IOException e) {
                 ToastUtils.show(getApplicationContext(), "Conexión con OBD fallida");
-                Intent intent = new Intent();
-                sendBroadcast(intent);
+                Intent intent = new Intent(ACTION_CONNECTION_FAILED);
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                 stopSelf();
             }
-            Intent intent = new Intent();
-            sendBroadcast(intent);
+            Intent intent = new Intent(ACTION_CONNECTION_CONNECTING);
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
             mySocket = temp;
         }
 
@@ -145,13 +143,13 @@ public class BluetoothServiceOBD extends Service {
             } catch (IOException e) {
                 try {
                     mySocket.close();
-                    Intent intent = new Intent();
-                    sendBroadcast(intent);
+                    Intent intent = new Intent(ACTION_CONNECTION_FAILED);
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                     ToastUtils.show(getApplicationContext(), "Conexión fallida con OBD");
                     stopSelf();
                 } catch (IOException e2) {
-                    Intent intent = new Intent();
-                    sendBroadcast(intent);
+                    Intent intent = new Intent(ACTION_CONNECTION_FAILED);
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                     ToastUtils.show(getApplicationContext(), "Conexión con OBD cerrada");
                     stopSelf();
                 }
@@ -166,50 +164,45 @@ public class BluetoothServiceOBD extends Service {
                 stopSelf();
             } finally {
                 Intent intent = new Intent();
-                sendBroadcast(intent);
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                 stopThreads();
             }
         }
     }
     private class ConnectedThread {
-        private final InputStream myInputStream;
-        private final OutputStream myOutputtream;
 
         public ConnectedThread(BluetoothSocket socket) {
-            InputStream tmpIn = null;
-            OutputStream tmpOut = null;
+            InputStream tmpIn;
+            OutputStream tmpOut;
 
             try {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
+                inputStream = tmpIn;
+                outputStream = tmpOut;
                 Log.d("Hay sockets", "hay sockets");
             } catch (IOException e) {
-                Intent intent = new Intent();
-                sendBroadcast(intent);
+                Intent intent = new Intent(ACTION_CONNECTION_FAILED);
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                 ToastUtils.show(getApplicationContext(), "Error en la transferencia con el OBD");
+                closeStreams();
                 stopSelf();
             }
-            myInputStream = tmpIn;
-            myOutputtream = tmpOut;
-            outputStream = tmpOut;
-            inputStream = tmpIn;
             startThreads();
-            Intent intent = new Intent();
-            sendBroadcast(intent);
+            Intent intent = new Intent(ACTION_CONNECTION_CONNECTED);
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
         }
 
         public void closeStreams() {
             try {
-                myInputStream.close();
-                myOutputtream.close();
                 inputStream.close();
                 outputStream.close();
             } catch (IOException e) {
                 stopSelf();
             } finally {
                 ToastUtils.show(getApplicationContext(), "Cerrando conexión con el OBD");
-                Intent intent = new Intent();
-                sendBroadcast(intent);
+                Intent intent = new Intent(ACTION_CONNECTION_FAILED);
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                 stopThreads();
             }
         }

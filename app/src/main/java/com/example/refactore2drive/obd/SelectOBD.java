@@ -3,11 +3,13 @@ package com.example.refactore2drive.obd;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.CursorIndexOutOfBoundsException;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
@@ -20,9 +22,9 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.refactore2drive.Helper;
 import com.example.refactore2drive.NavigationHost;
 import com.example.refactore2drive.R;
-import com.example.refactore2drive.controlpanel.InfoGridFragment;
 import com.example.refactore2drive.database.DatabaseHelper;
 import com.example.refactore2drive.heart.SelectWear;
 import com.example.refactore2drive.models.Device;
@@ -33,6 +35,15 @@ public class SelectOBD extends Fragment {
     private SwitchCompat switchCompat;
     private ListView listView;
     private DeviceListAdapter deviceListAdapter;
+    private String username;
+    private DatabaseHelper db;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        db = new DatabaseHelper(getActivity());
+        username = Helper.getUsername(getActivity());
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,6 +53,13 @@ public class SelectOBD extends Fragment {
         listView = view.findViewById(R.id.obd_list);
         deviceListAdapter = new DeviceListAdapter();
         listView.setAdapter(deviceListAdapter);
+        listView.setOnItemClickListener((parent, view1, position, id) -> {
+            BluetoothDevice device = deviceListAdapter.getDevice(position);
+            if (!username.equals("No encontrado")) {
+                db.createObd(new Device(device.getName(), device.getAddress(), username));
+            }
+            ((NavigationHost) getActivity()).navigateTo(new SelectWear(), false);
+        });
         return view;
     }
 
@@ -49,19 +67,10 @@ public class SelectOBD extends Fragment {
     public void onStart() {
         super.onStart();
         BluetoothAdapter myAdapter = BluetoothAdapter.getDefaultAdapter();
-        DatabaseHelper db = new DatabaseHelper(getActivity());
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String username = preferences.getString("username", "No encontrado");
-        if (!username.equals("No encontrado")) {
-           try {
-               Device device = db.getObd(username);
-               Intent intent = new Intent(getActivity(), BluetoothServiceOBD.class);
-               intent.putExtra("deviceAddress", device.getAddress());
-               getActivity().startService(intent);
-               ((NavigationHost) getActivity()).navigateTo(new SelectWear(), false);
-           } catch (CursorIndexOutOfBoundsException e) {
-               Log.e("dispositivo no guardado", "no guardado");
-           }
+        try {
+            ((NavigationHost) getActivity()).navigateTo(new SelectWear(), false);
+        } catch (CursorIndexOutOfBoundsException e) {
+            Log.e("dispositivo no guardado", "no guardado");
         }
         if (myAdapter != null) {
             for (BluetoothDevice device : myAdapter.getBondedDevices()) {
@@ -69,16 +78,13 @@ public class SelectOBD extends Fragment {
                 deviceListAdapter.notifyDataSetChanged();
             }
         }
-        listView.setOnItemClickListener((parent, view1, position, id) -> {
-            Intent intent = new Intent(getActivity(), BluetoothServiceOBD.class);
-            BluetoothDevice device = deviceListAdapter.getDevice(position);
-            if (!username.equals("No encontrado")) {
-                db.createObd(new Device(device.getName(), device.getAddress(), username));
-            }
-            intent.putExtra("deviceAddress", device.getAddress());
-            getActivity().startService(intent);
-            ((NavigationHost) getActivity()).navigateTo(new SelectWear(), false);
-        });
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        deviceListAdapter.clear();
+        db.closeDB();
     }
 
     private class DeviceListAdapter extends BaseAdapter {

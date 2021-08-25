@@ -17,7 +17,6 @@ import android.widget.TextView;
 import com.example.refactore2drive.R;
 import com.example.refactore2drive.models.SessionModel;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputLayout;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -32,7 +31,6 @@ public class SessionFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_session, container, false);
         sessionListAdapter = new SessionListAdapter();
         listSessions = view.findViewById(R.id.list_sessions);

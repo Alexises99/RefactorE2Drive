@@ -1,10 +1,13 @@
 package com.example.refactore2drive;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Helper {
 
@@ -29,5 +32,39 @@ public class Helper {
         else val = (time.getHour()*60*60+time.getMinute()*60)+30;
         return val;
     }
+
+    public static HashMap<String, String> initFilter() {
+        HashMap<String, String> filter = new HashMap<>();
+        filter.put("Engine RPM", "RPM");
+        filter.put("Barometric Pressure", "kPa");
+        filter.put("Wideband Air/Fuel Ratio", "AFR");
+        filter.put("Throttle Position", "%");
+        filter.put("Vehicle Speed", "km/h");
+        filter.put("Mass Air Flow", "g/s");
+        filter.put("Ambient Air Temperature", "C");
+        filter.put("Engine oil temperature", "C");
+        filter.put("Engine Runtime", "");
+        filter.put("Air Intake Temperature", "C");
+        filter.put("Fuel Type", "");
+        filter.put("Absolute load", "%");
+        filter.put("Engine Load", "%");
+        filter.put("Fuel Consumption Rate", "L/h");
+        filter.put("Air/Fuel Ratio", "AFR");
+        filter.put("Intake Manifold Pressure", "kPa");
+        filter.put("Engine Coolant Temperature", "C");
+        filter.put("Fuel Level", "%");
+        filter.put("Fuel Rail Pressure", "kPa");
+        filter.put("Fuel Pressure", "kPa");
+        filter.put("Short Term Fuel Trim Bank 1", "%");
+        return initFilter();
+    }
+
+    public static String getUsername(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String username = preferences.getString("username", "error");
+        if (username.equals("error")) return "error";
+        else return username;
+    }
+
 
 }

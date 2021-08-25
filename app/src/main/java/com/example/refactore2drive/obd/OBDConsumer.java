@@ -21,6 +21,7 @@ public class OBDConsumer implements Runnable{
     public final static String ACTION_SEND_DATA_SPEED="ACTION_OBD_DATA_SPEED";
     public final static String ACTION_SEND_DATA_CONSUME="ACTION_OBD_DATA_CONSUME";
     public final static String ACTION_SEND_DATA_FUEL="ACTION_OBD_DATA_FUEL";
+    public final static String ACTION_DISCONNECTED="com.example_ACTION_DISCONNECTED";
     private final static String TAG = OBDConsumer.class.getName();
 
     public OBDConsumer(BlockingQueue<OBDCommandJob> queue,Context context) {
@@ -51,7 +52,10 @@ public class OBDConsumer implements Runnable{
                     try {
                         if (e2.getMessage().contains("Broken pipe")) {
                             job.setState(OBDCommandJob.ObdCommandJobState.BROKEN_PIPE);
+                            Intent intent = new Intent(ACTION_DISCONNECTED);
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                             Thread.currentThread().interrupt();
+
                         }
                         else job.setState(OBDCommandJob.ObdCommandJobState.EXECUTION_ERROR);
                     } catch (NullPointerException e) {
@@ -67,8 +71,6 @@ public class OBDConsumer implements Runnable{
                 if (job != null) job.setState(OBDCommandJob.ObdCommandJobState.EXECUTION_ERROR);
             }
             final OBDCommandJob job2 = job;
-            /*if (!mode)((MainActivity) context).runOnUiThread(() -> ((MainActivity) context).stateUpdate(job2));
-            else ((DevActivity) context).runOnUiThread(() -> ((DevActivity) context).stateUpdate(job2));*/
             stateUpdate(job2);
         }
     }
@@ -101,8 +103,9 @@ public class OBDConsumer implements Runnable{
             cmdResult = job.getCommand().getResult();
         } else if (job.getState().equals(OBDCommandJob.ObdCommandJobState.BROKEN_PIPE)) {
             Log.e(TAG, "ERRORR BROKEN PIPE");
+            Intent intent = new Intent(ACTION_DISCONNECTED);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
             Thread.currentThread().interrupt();
-            ToastUtils.show(context, "OBD desconectado");
         } else if (job.getState().equals(OBDCommandJob.ObdCommandJobState.NOT_SUPPORTED)) {
             cmdResult = "Comando no soportado";
         } else {

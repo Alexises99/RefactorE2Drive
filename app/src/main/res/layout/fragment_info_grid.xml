@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".controlpanel.InfoGridFragment">
+    tools:context=".controlpanel.InfoGridFragment"
+    android:orientation="vertical">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -18,11 +19,44 @@
             app:title="E2Drive" />
     </com.google.android.material.appbar.AppBarLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:text="Estado OBD"/>
+        <TextView
+            android:id="@+id/status_obd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Desconocido"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:text="Estado Pulsera"/>
+        <TextView
+            android:id="@+id/status_heart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Desconocido"/>
+    </LinearLayout>
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="56dp"
-        android:background="#bdc3c7"
+        android:layout_marginTop="8dp"
+        android:paddingTop="16dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -33,4 +67,4 @@
             android:layout_height="match_parent" />
 
     </androidx.core.widget.NestedScrollView>
-</FrameLayout>
+</LinearLayout>

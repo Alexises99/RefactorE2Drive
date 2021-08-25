@@ -1,6 +1,5 @@
 package com.example.refactore2drive.chart;
 
-import java.io.Serializable;
 
 public class Value {
     private long x, y;

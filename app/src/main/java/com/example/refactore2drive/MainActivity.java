@@ -4,31 +4,24 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 
 import com.example.refactore2drive.call.CallFragment;
 import com.example.refactore2drive.chart.ChartFragment;
 import com.example.refactore2drive.controlpanel.InfoGridFragment;
-import com.example.refactore2drive.database.DatabaseHelper;
-import com.example.refactore2drive.heart.BluetoothLeService;
 import com.example.refactore2drive.login.LoginFragment;
-import com.example.refactore2drive.models.Person;
 import com.example.refactore2drive.obd.BluetoothServiceOBD;
 import com.example.refactore2drive.sessions.SessionFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity implements NavigationHost{
+    public static final String ACTION_SEND_DATA_HEART = "com.example_ACTION_SEND_DATA_HEART";
+    public static final String ACTION_SEND_DATA_ODB = "com.example_ACTION_SEND_DATA_ODB";
     public static long prevSpeed = -1;
     public static long prevConsume = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,27 +54,6 @@ public class MainActivity extends AppCompatActivity implements NavigationHost{
         }
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d("Me reinicie", "Me reinicie");
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        DatabaseHelper db = new DatabaseHelper(this);
-        startService(new Intent(this, BluetoothServiceOBD.class).putExtra("deviceAddress",db.getObd(preferences.getString("username","error")).getAddress()));
-        db.closeDB();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        stopService(new Intent(this, BluetoothServiceOBD.class));
-    }
 
     @Override
     public void navigateTo(Fragment fragment, boolean addToBackStack) {

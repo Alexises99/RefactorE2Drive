@@ -3,10 +3,12 @@ package com.example.refactore2drive.heart;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.CursorIndexOutOfBoundsException;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
@@ -21,6 +23,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.refactore2drive.Helper;
 import com.example.refactore2drive.NavigationHost;
 import com.example.refactore2drive.R;
 import com.example.refactore2drive.controlpanel.InfoGridFragment;
@@ -36,6 +39,7 @@ public class SelectWear extends Fragment {
     private DeviceListAdapter deviceListAdapter;
     private  ListView listView;
     private DatabaseHelper db;
+    private String username;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,28 +48,23 @@ public class SelectWear extends Fragment {
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        scanLeDevice(false);
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        db = new DatabaseHelper(getActivity());
+        username = Helper.getUsername(getActivity());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_select_wear, container, false);
         listView = view.findViewById(R.id.wear_list);
         switchCompat = view.findViewById(R.id.wear_switch);
         deviceListAdapter = new DeviceListAdapter();
         listView.setAdapter(deviceListAdapter);
-        db = new DatabaseHelper(getActivity());
         listView.setOnItemClickListener((adapterView, view1, i, l) -> {
             BluetoothDevice device = deviceListAdapter.getDevice(i);
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            final String username = preferences.getString("username", "No esta");
-            if (!username.equals("No esta")) {
-                db.createWear(new Device(device.getName(), device.getAddress(), username));
-            }
+            db.createWear(new Device(device.getName(), device.getAddress(), username));
             if (mScanning) {
                 myAdapter.stopLeScan(mLeScanCallback);
                 mScanning = false;
@@ -74,7 +73,6 @@ public class SelectWear extends Fragment {
 
             getActivity().findViewById(R.id.bottom_navigation).setVisibility(View.VISIBLE);
         });
-
         return view;
     }
 
@@ -82,18 +80,21 @@ public class SelectWear extends Fragment {
     public void onStart() {
         super.onStart();
         scanLeDevice(true);
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        final String username = preferences.getString("username", "No esta");
-        if (!username.equals("No esta")) {
-            try {
-                Device device = db.getWear(username);
-                ((NavigationHost) getActivity()).navigateTo(InfoGridFragment.newInstance(device.getAddress()), false);
-                getActivity().findViewById(R.id.bottom_navigation).setVisibility(View.VISIBLE);
-            } catch (CursorIndexOutOfBoundsException e) {
-                Log.e("Error al recuperar wear", "error");
-            }
+        try {
+            Device device = db.getWear(username);
+            ((NavigationHost) getActivity()).navigateTo(InfoGridFragment.newInstance(device.getAddress()), false);
+            getActivity().findViewById(R.id.bottom_navigation).setVisibility(View.VISIBLE);
+        } catch (CursorIndexOutOfBoundsException e) {
+            Log.e("Error al recuperar wear", "error");
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        deviceListAdapter.clear();
+        db.closeDB();
+        scanLeDevice(false);
     }
 
     private void scanLeDevice(final boolean enable) {
