@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -30,6 +31,7 @@ import android.widget.TextView;
 import com.example.refactore2drive.Helper;
 import com.example.refactore2drive.MainActivity;
 import com.example.refactore2drive.R;
+import com.example.refactore2drive.activities.MoreInfoActivity;
 import com.example.refactore2drive.chart.Value;
 import com.example.refactore2drive.database.DatabaseHelper;
 import com.example.refactore2drive.heart.BluetoothLeService;
@@ -66,6 +68,7 @@ public class InfoGridFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         Log.d("Holis", "aki etoy");
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -76,7 +79,6 @@ public class InfoGridFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-
     }
 
     @Override
@@ -324,24 +326,28 @@ public class InfoGridFragment extends Fragment {
     };
 
 
-
     private void setUpToolbar(View view) {
         Toolbar toolbar = view.findViewById(R.id.app_bar);
         AppCompatActivity activity = (AppCompatActivity) getActivity();
-        if (activity != null)
-            Log.d("HOla", "hola");
-        try{
+        if (activity != null) {
             activity.setSupportActionBar(toolbar);
-        } catch (NullPointerException e) {
-            Log.e("Error", "error inesperado en la barra");
         }
-
     }
 
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_toolbar, menu);
-        super.onCreateOptionsMenu(menu, inflater);
+    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+        menuInflater.inflate(R.menu.menu_toolbar, menu);
+        super.onCreateOptionsMenu(menu, menuInflater);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.more_info:
+                startActivity(new Intent(getActivity(), MoreInfoActivity.class));
+                return true;
+            default:
+                return false;
+        }
+    }
 }

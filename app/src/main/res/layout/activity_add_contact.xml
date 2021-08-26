@@ -64,8 +64,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/edit_number"
             android:inputType="number"
-            android:maxLines="1"
-    />
+            android:maxLines="1" />
+
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
@@ -75,5 +75,7 @@
         android:layout_gravity="bottom|right"
         android:id="@+id/add_contact_but"
         android:text="Añadir" />
+
     </LinearLayout>
+
 </LinearLayout>

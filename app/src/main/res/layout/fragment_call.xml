@@ -5,18 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".call.CallFragment"
-    android:layout_marginBottom="60dp">
+    android:layout_marginBottom="16dp" >
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content" >
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/app_bar"
             style="@style/Widget.Shrine.Toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="E2Drive" />
+            app:title="E2Drivee" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -26,12 +26,12 @@
         android:layout_height="match_parent"
         android:layout_margin="10dp"
         android:paddingTop="20dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" >
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/call_recycler"/>
+            android:id="@+id/call_recycler" />
 
     </androidx.core.widget.NestedScrollView>
 
@@ -41,9 +41,7 @@
         android:id="@+id/float_call"
         android:layout_gravity="bottom|right"
         android:layout_margin="16dp"
-
         android:contentDescription="Añadir contactos"
         app:srcCompat="@drawable/ic_add_call" />
-
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

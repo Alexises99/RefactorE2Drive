@@ -5,35 +5,56 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".chart.ChartFragment"
-    android:layout_margin="16dp"
-    android:orientation="vertical">
+    android:orientation="vertical" >
 
-   <com.google.android.material.textfield.TextInputLayout
-      android:id="@+id/chartDateInput"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="8dp"
-       android:hint="Introduce una fecha"
-       app:helperTextEnabled="true"
-       app:helperText="Haz click para seleccionar">
-      <com.google.android.material.textfield.TextInputEditText
-         android:id="@+id/chartDateEdit"
+   <com.google.android.material.appbar.AppBarLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content" >
+
+      <androidx.appcompat.widget.Toolbar
+          android:id="@+id/app_bar"
+          style="@style/Widget.Shrine.Toolbar"
+          android:layout_width="match_parent"
+          android:layout_height="?attr/actionBarSize"
+          app:title="E2Drivee" />
+
+   </com.google.android.material.appbar.AppBarLayout>
+
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_margin="16dp"
+       android:orientation="vertical" >
+
+      <com.google.android.material.textfield.TextInputLayout
+          android:id="@+id/chartDateInput"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:inputType="date"
-          android:focusable="false"
-          android:clickable="true"
-          android:maxLines="1"/>
-   </com.google.android.material.textfield.TextInputLayout>
+          android:layout_marginBottom="8dp"
+          android:hint="Introduce una fecha"
+          app:helperTextEnabled="true"
+          app:helperText="Haz click para seleccionar" >
 
+         <com.google.android.material.textfield.TextInputEditText
+             android:id="@+id/chartDateEdit"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:inputType="date"
+             android:focusable="false"
+             android:clickable="true"
+             android:maxLines="1" />
 
-   <com.github.mikephil.charting.charts.LineChart
-       android:layout_width="match_parent"
-       android:layout_height="620dp"
-       android:layout_marginStart="16dp"
-       android:layout_marginEnd="16dp"
-       android:layout_marginTop="16dp"
-       android:layout_marginBottom="16dp"
-       android:id="@+id/chart" />
+      </com.google.android.material.textfield.TextInputLayout>
+
+      <com.github.mikephil.charting.charts.LineChart
+          android:layout_width="match_parent"
+          android:layout_height="620dp"
+          android:layout_marginStart="16dp"
+          android:layout_marginEnd="16dp"
+          android:layout_marginTop="16dp"
+          android:layout_marginBottom="16dp"
+          android:id="@+id/chart" />
+
+   </LinearLayout>
 
 </LinearLayout>

@@ -9,7 +9,7 @@
     android:layout_marginBottom="48dp"
     android:layout_marginRight="16dp"
     android:layout_marginLeft="16dp"
-    android:padding="16dp">
+    android:padding="16dp" >
 
     <androidx.appcompat.widget.SwitchCompat
         android:layout_width="wrap_content"
@@ -26,13 +26,12 @@
         android:textSize="24sp"
         android:gravity="center"
         android:text="Selecciona una pulsera"
-        style="@style/TextAppearance.Shrine.Title"/>
+        style="@style/TextAppearance.Shrine.Title" />
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:id="@+id/wear_list" />
-
 
 </LinearLayout>

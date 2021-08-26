@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 public class OBDConsumer implements Runnable{
@@ -31,7 +32,7 @@ public class OBDConsumer implements Runnable{
     private final static String TAG = OBDConsumer.class.getName();
     private HashMap<String, String> commandResults;
     private HashMap<String, String> filter;
-    private ArrayList<String> collectedData;
+    public ArrayList<String> collectedData;
 
     public OBDConsumer(BlockingQueue<OBDCommandJob> queue,Context context) {
         this.queue = queue;
@@ -144,6 +145,12 @@ public class OBDConsumer implements Runnable{
                 @Override
                 public void run() {
                     processCollectedData();
+                    try{
+                        sleep(1000);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+
                 }
             }).start();
         }
@@ -167,11 +174,14 @@ public class OBDConsumer implements Runnable{
             }
         }
         Arrays.stream(results).forEach(value -> collectedData.add(value));
-        if(collectedData.size() > 25) {
-            Log.d("Colectado", collectedData.toString());
+        if(collectedData.size() > 10) {
+            Log.d("Colectado", " " + collectedData.size());
             Intent intent = new Intent(ACTION_SEND_DATA_OBD_SESSION);
-            intent.putExtra("collectedData", collectedData);
-            intent.putExtra("hola", collectedData);
+            ArrayList<String> list = new ArrayList<>();
+            for (String data : collectedData) {
+                list.add(data);
+            }
+            intent.putExtra("lista", list);
             LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
             collectedData.clear();
         }

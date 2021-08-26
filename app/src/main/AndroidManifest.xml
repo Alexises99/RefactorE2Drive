@@ -21,6 +21,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Shrine">
         <activity
+            android:name=".activities.MoreInfoActivity"
+            android:exported="true" />
+        <activity
+            android:name=".activities.DeveloperModeActivity"
+            android:exported="true" />
+        <activity
             android:name=".login.SignupActivity"
             android:exported="true" />
 
@@ -28,6 +34,7 @@
             android:name=".heart.BluetoothLeService"
             android:enabled="true"
             android:exported="true" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -40,6 +47,7 @@
         <activity
             android:name=".call.AddContactActivity"
             android:exported="true" />
+
         <service
             android:name=".obd.BluetoothServiceOBD"
             android:enabled="true" />

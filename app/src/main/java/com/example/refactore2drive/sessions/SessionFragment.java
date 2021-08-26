@@ -2,15 +2,19 @@ package com.example.refactore2drive.sessions;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.CursorIndexOutOfBoundsException;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -47,16 +51,16 @@ public class SessionFragment extends Fragment {
     public static final String ACTION_SESSION_END = "com.example_ACTION_SESSION_END";
 
     @Override
-    public void onResume() {
-        super.onResume();
-        db = new DatabaseHelper(getActivity());
-        username = Helper.getUsername(getActivity());
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_session, container, false);
+        setUpToolbar(view);
         sessionListAdapter = new SessionListAdapter();
         listSessions = view.findViewById(R.id.list_sessions);
         listSessions.setAdapter(sessionListAdapter);
@@ -66,6 +70,25 @@ public class SessionFragment extends Fragment {
         commentInput = view.findViewById(R.id.comment_input);
         listeners();
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        db = new DatabaseHelper(getActivity());
+        username = Helper.getUsername(getActivity());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        db.closeDB();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater menuInflater) {
+        menuInflater.inflate(R.menu.menu_toolbar, menu);
+        super.onCreateOptionsMenu(menu, menuInflater);
     }
 
     private void listeners() {
@@ -108,20 +131,28 @@ public class SessionFragment extends Fragment {
             Person person = db.getPerson(username);
             Discapacity discapacity = db.getDiscapacity(username).get(0);
             ArrayList<Disease> diseases = new ArrayList<>(db.getInjuries(username));
-            String list = "";
-            list += "Nombre: " + person.getName() + "\n";
-            list += "Edad: " + person.getAge() + "\n";
-            list += "Genero: " + person.getGenre() + "\n";
-            list += "Altura: " + person.getHeight() + "\n";
-            list += "Peso: " + person.getWeight() + "\n";
-            list += "Tipo discapcidad: " + discapacity.getType() + "\n";
-            list += "Grado discapacidad: " + discapacity.getDegree() + "\n";
-            for (Disease disease : diseases) list += "Enfermedad: " + disease.getName() + "\n";
+            StringBuilder list = new StringBuilder();
+            list.append("Nombre: ").append(person.getName()).append("\n");
+            list.append("Edad: ").append(person.getAge()).append("\n");
+            list.append("Genero: ").append(person.getGenre()).append("\n");
+            list.append("Altura: ").append(person.getHeight()).append("\n");
+            list.append("Peso: ").append(person.getWeight()).append("\n");
+            list.append("Tipo discapcidad: ").append(discapacity.getType()).append("\n");
+            list.append("Grado discapacidad: ").append(discapacity.getDegree()).append("\n");
+            for (Disease disease : diseases) list.append("Enfermedad: ").append(disease.getName()).append("\n");
             String[] res = new String[1];
-            res[0] = list;
+            res[0] = list.toString();
             return res;
         } catch (CursorIndexOutOfBoundsException e) {
             return null;
+        }
+    }
+
+    private void setUpToolbar(View view) {
+        Toolbar toolbar = view.findViewById(R.id.app_bar);
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        if (activity != null) {
+            activity.setSupportActionBar(toolbar);
         }
     }
 

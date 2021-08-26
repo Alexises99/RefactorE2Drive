@@ -5,10 +5,15 @@ import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -40,6 +45,49 @@ public class ChartFragment extends Fragment {
     private LineChart chart;
     private EditText date;
     private String username;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        db = new DatabaseHelper(context);
+        username = Helper.getUsername(getActivity());
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_chart, container, false);
+        setUpToolbar(view);
+        chart = view.findViewById(R.id.chart);
+        date = view.findViewById(R.id.chartDateEdit);
+        date.setOnClickListener(view1 -> showDatePickerDialog());
+        return  view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        populate();
+        drawChart(LocalDate.now());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        db.closeDB();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater menuInflater) {
+        menuInflater.inflate(R.menu.menu_toolbar, menu);
+        super.onCreateOptionsMenu(menu, menuInflater);
+    }
 
     private void populate() {
         quarters = new HashMap<>();
@@ -91,26 +139,6 @@ public class ChartFragment extends Fragment {
         return db.getDataSpeedByDate(username, date.toString());
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        populate();
-        drawChart(LocalDate.now());
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        db = new DatabaseHelper(context);
-        username = Helper.getUsername(getActivity());
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        db.closeDB();
-    }
-
     private void configureLegend(Legend legend) {
         legend.setFormSize(10f);
         legend.setForm(Legend.LegendForm.CIRCLE);
@@ -118,16 +146,6 @@ public class ChartFragment extends Fragment {
         legend.setTextSize(12f);
         legend.setXEntrySpace(5f);
         legend.setYEntrySpace(5f);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_chart, container, false);
-        chart = view.findViewById(R.id.chart);
-        date = view.findViewById(R.id.chartDateEdit);
-        date.setOnClickListener(view1 -> showDatePickerDialog());
-        return  view;
     }
 
     private void drawChart(LocalDate date) {
@@ -175,5 +193,13 @@ public class ChartFragment extends Fragment {
             drawChart(LocalDate.of(year,month+1,day));
         });
         newFragment.show(getActivity().getSupportFragmentManager(),"datePicker");
+    }
+
+    private void setUpToolbar(View view) {
+        Toolbar toolbar = view.findViewById(R.id.app_bar);
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        if (activity != null) {
+            activity.setSupportActionBar(toolbar);
+        }
     }
 }

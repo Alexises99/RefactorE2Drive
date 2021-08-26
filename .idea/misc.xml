@@ -5,7 +5,9 @@
       <map>
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/drawable-anydpi/ic_silence.xml" value="0.15" />
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/activity_add_contact.xml" value="0.25885416666666666" />
+        <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/activity_developer_mode.xml" value="0.27291666666666664" />
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/activity_main.xml" value="0.13958333333333334" />
+        <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/activity_more_info.xml" value="0.27291666666666664" />
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/activity_signup.xml" value="0.27291666666666664" />
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/contact_card.xml" value="0.27291666666666664" />
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/content_add_contact.xml" value="0.27291666666666664" />
@@ -13,8 +15,10 @@
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/fragment_call.xml" value="0.2" />
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/fragment_chart.xml" value="0.23745819397993312" />
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/fragment_date_picker.xml" value="0.27708333333333335" />
-        <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/fragment_info_grid.xml" value="0.67" />
+        <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/fragment_first.xml" value="0.27291666666666664" />
+        <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/fragment_info_grid.xml" value="0.29812981298129815" />
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/fragment_login.xml" value="0.27291666666666664" />
+        <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/fragment_second.xml" value="0.27291666666666664" />
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/fragment_select_o_b_d.xml" value="0.199438202247191" />
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/fragment_select_wear.xml" value="0.27291666666666664" />
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/fragment_session.xml" value="0.27291666666666664" />

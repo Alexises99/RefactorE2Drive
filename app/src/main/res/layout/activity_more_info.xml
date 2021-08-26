@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.MoreInfoActivity"
+    android:layout_marginTop="16dp"
+    android:layout_marginBottom="8dp"
+    android:layout_marginHorizontal="16dp" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="256dp"
+            android:layout_marginHorizontal="64dp"
+            app:srcCompat="@drawable/ic_logo" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Más información"
+            android:gravity="center_horizontal"
+            android:textStyle="bold"
+            android:textSize="32sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoLink="web"
+            android:textSize="24sp"
+            android:text="https://e2drive.es"
+            android:gravity="center_horizontal" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"
+            android:text="El proyecto e2Drive “Coche eléctrico optimizado para la movilidad urbana segura de discapacitados físicos” propone el desarrollo de un novedoso coche eléctrico capaz de proporcionar un nivel de movilidad y seguridad sin precedentes a personas discapacitadas con movilidad reducida, a un precio asequible muy por debajo de las soluciones actuales." />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textSize="16sp"
+            android:text="La seguridad y salud del discapacitado es un objetivo primordial, y por ello e2Drive desarrolla un sistema inteligente de monitorización del estado de salud y nivel de alerta o cansancio por medio del análisis de la conducción y otras variables, como sus constantes vitales." />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:layout_width="187dp"
+                android:layout_height="180dp"
+                app:srcCompat="@drawable/ic_logo_espana"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:layout_width="187dp"
+                android:layout_height="153dp"
+                app:srcCompat="@drawable/flag_ue"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

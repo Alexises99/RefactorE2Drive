@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -22,6 +23,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -43,6 +46,12 @@ public class CallFragment extends Fragment {
     private static final int REQUEST_CALL = 1;
     private  DatabaseHelper db;
     private String username;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -119,8 +128,14 @@ public class CallFragment extends Fragment {
     private void setUpToolbar(View view) {
         Toolbar toolbar = view.findViewById(R.id.app_bar);
         AppCompatActivity activity = (AppCompatActivity) getActivity();
-        if (activity != null)
-            Log.d("HOla", "hola");
-        activity.setSupportActionBar(toolbar);
+        if (activity != null) {
+            activity.setSupportActionBar(toolbar);
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+        menuInflater.inflate(R.menu.menu_toolbar, menu);
+        super.onCreateOptionsMenu(menu, menuInflater);
     }
 }

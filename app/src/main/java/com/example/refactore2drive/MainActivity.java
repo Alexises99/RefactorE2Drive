@@ -1,18 +1,18 @@
 package com.example.refactore2drive;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.View;
 
 import com.example.refactore2drive.call.CallFragment;
 import com.example.refactore2drive.chart.ChartFragment;
 import com.example.refactore2drive.controlpanel.InfoGridFragment;
 import com.example.refactore2drive.login.LoginFragment;
-import com.example.refactore2drive.obd.BluetoothServiceOBD;
 import com.example.refactore2drive.sessions.SessionFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity implements NavigationHost{
                     .commit();
         }
     }
-
 
     @Override
     public void navigateTo(Fragment fragment, boolean addToBackStack) {

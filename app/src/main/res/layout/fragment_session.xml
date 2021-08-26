@@ -5,69 +5,87 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".sessions.SessionFragment"
-    android:layout_margin="16dp"
-    android:orientation="vertical">
+    android:orientation="vertical" >
 
-    <RelativeLayout
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/app_bar"
+            style="@style/Widget.Shrine.Toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="E2Drivee" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal">
+        android:orientation="vertical"
+        android:layout_margin="16dp" >
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/start_session"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/Widget.Shrine.Button"
-            android:layout_alignParentStart="true"
-            android:layout_margin="8dp"
-            android:text="Comenzar Sesión" />
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/end_session"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/Widget.Shrine.Button"
-            android:layout_margin="8dp"
-            android:layout_alignParentStart="false"
-            android:layout_alignParentEnd="true"
-            android:text="Detener Sesión" />
-    </RelativeLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/comment_input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/Widget.Shrine.TextInputLayout"
-        app:startIconDrawable="@drawable/ic_session"
-        app:endIconMode="clear_text"
-        app:helperTextEnabled="true"
-        app:helperText="Introduce un comentario para la siguiente sesión"
-        app:counterEnabled="true"
-        app:counterMaxLength="100"
-        android:hint="Comentarios" >
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/comment_edit"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textLongMessage" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_gravity="center_horizontal" >
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/start_session"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.Shrine.Button"
+                android:layout_alignParentStart="true"
+                android:layout_margin="8dp"
+                android:text="Comenzar Sesión" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/end_session"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.Shrine.Button"
+                android:layout_margin="8dp"
+                android:layout_alignParentStart="false"
+                android:layout_alignParentEnd="true"
+                android:text="Detener Sesión" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Historico de Sesiones"
-        android:gravity="center"/>
+        </RelativeLayout>
 
-    <ListView
-        android:id="@+id/list_sessions"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:divider="@null"
-        android:dividerHeight="0dp"
-        />
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/comment_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.Shrine.TextInputLayout"
+            app:startIconDrawable="@drawable/ic_session"
+            app:endIconMode="clear_text"
+            app:helperTextEnabled="true"
+            app:helperText="Introduce un comentario para la siguiente sesión"
+            app:counterEnabled="true"
+            app:counterMaxLength="100"
+            android:hint="Comentarios" >
 
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/comment_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textLongMessage" />
 
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Historico de Sesiones"
+            android:gravity="center" />
+
+        <ListView
+            android:id="@+id/list_sessions"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null"
+            android:dividerHeight="0dp" />
+
+    </LinearLayout>
 </LinearLayout>

@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item
         android:id="@+id/page_1"
         android:enabled="true"
         android:icon="@drawable/ic_panel"
-        android:title="Panel"/>
+        android:title="Panel" />
+
     <item
         android:id="@+id/page_2"
         android:enabled="true"
         android:icon="@drawable/ic_call"
-        android:title="Llamar"/>
+        android:title="Llamar" />
+
     <item
         android:id="@+id/page_3"
         android:enabled="true"
         android:icon="@drawable/ic_chart"
-        android:title="Gráficos"/>
+        android:title="Gráficos" />
+
     <item
         android:id="@+id/page_4"
         android:enabled="true"
         android:icon="@drawable/ic_session"
-        android:title="Sesiones"/>
+        android:title="Sesiones" />
+
 </menu>

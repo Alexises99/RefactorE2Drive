@@ -5,13 +5,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.example.refactore2drive.MainActivity;
+
 import com.example.refactore2drive.obd.OBDConsumer;
 
 import java.io.IOException;
@@ -30,17 +29,18 @@ public class TransferDataService extends Service {
             final String action = intent.getAction();
             Log.d("INTENT", "accion: " + action);
             if (action.equals(OBDConsumer.ACTION_SEND_DATA_OBD_SESSION)) {
-                Log.d("a ver",intent.getExtras().toString());
-                ArrayList<String> collectedData = (ArrayList<String>) intent.getSerializableExtra("hola");
-                Log.d("ARRAY", "data: " + collectedData.toString());
+                Log.d("Extras",intent.getExtras().toString());
+                //TODO No funciona
+                ArrayList<String> list = intent.getStringArrayListExtra("lista");
+                Log.d("Array", "data: " + list.toString());
                 if (odbSession != null) {
-                    String[] def = new String[collectedData.size()];
+                    String[] def = new String[list.size()];
                     Log.d(TAG, "La longuitud del string es: " + def.length);
-                    odbSession.writeData(collectedData.toArray(def));
+                    odbSession.writeData(list.toArray(def));
                 }   //TODO esta mal la accion del elseif
             } else if (action.equals(OBDConsumer.ACTION_SEND_DATA_CONSUME)) {
                 String data = intent.getStringExtra("data");
-                Log.d("PULSO RECIVIDO", "pulso: " + data);
+                Log.d("PULSO RECIBIDO", "pulso: " + data);
                 String[] def = new String[2];
                 def[0] = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
                 def[1] = data;
@@ -59,7 +59,7 @@ public class TransferDataService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
             try{
-                odbSession = new Session(intent.getStringExtra("name") + "ODB", intent.getStringArrayExtra("comment"),getApplicationContext().getFilesDir().getPath(),Headers.headersUnit,intent.getStringArrayExtra("data"));
+                odbSession = new Session(intent.getStringExtra("name"), intent.getStringArrayExtra("comment"),getApplicationContext().getFilesDir().getPath(),Headers.headersUnit,intent.getStringArrayExtra("data"));
                 //heartSession = new Session(intent.getStringExtra("name") + "Heart", intent.getStringArrayExtra("comment"),getApplicationContext().getFilesDir().getPath(),Headers.headersHeart,intent.getStringArrayExtra("data"));
             } catch (Session.ErrorSDException error) {
                 Log.d("ERRORSD", "SD NO INSERTADA");
