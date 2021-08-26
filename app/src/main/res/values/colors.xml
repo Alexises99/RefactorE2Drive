@@ -16,4 +16,5 @@
     <color name="productGridBackgroundColor">#FFFBFA</color>
     <color name="textInputOutlineColor">#FBB8AC</color>
     <color name="bgbottomnav">#7FB005</color>
+    <color name="background_material_light">#ffeeeeee</color>
 </resources>

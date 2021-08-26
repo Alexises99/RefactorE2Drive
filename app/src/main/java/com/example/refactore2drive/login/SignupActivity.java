@@ -41,6 +41,7 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     private void initialize() {
+        //Inicialización de componentes
         cancelButton = findViewById(R.id.cancel_button_reg);
         nextButton = findViewById(R.id.next_button_reg);
         listDiseases = findViewById(R.id.list_diseases_reg);
@@ -69,7 +70,13 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     private void listeners() {
+        //Si cancela se finaliza la actividad
         cancelButton.setOnClickListener(view -> finish());
+
+        /*
+        Comprueba que la enfermedad no este en blanco en el caso de añadir y que no haya ninguna
+        repetida
+         */
         addDisease.setOnClickListener(view -> {
             if (!isTextValid(diseaseEdit.getText())) diseaseInput.setError("Campo no puede estar vacio");
             else if (arrayAdapter.getPosition(diseaseEdit.getText().toString()) != -1) diseaseInput.setError("No puedes introducir campos repetidos");
@@ -78,6 +85,8 @@ public class SignupActivity extends AppCompatActivity {
                 arrayAdapter.notifyDataSetChanged();
             }
         });
+
+        //Manejo de errores
         diseaseEdit.setOnKeyListener((view, i, keyEvent) -> {
             if (isTextValid(diseaseEdit.getText())) diseaseInput.setError(null);
             if (arrayAdapter.getPosition(diseaseEdit.getText().toString()) == -1) diseaseInput.setError(null);
@@ -148,7 +157,7 @@ public class SignupActivity extends AppCompatActivity {
                 degreeInput.setError("Campo requerido");
                 correct = false;
             }
-
+            //Si todos los campos estan bien se genera el string con el genero del usuario
             if (correct) {
                 String genre = null;
                 switch (radioGroup.getCheckedRadioButtonId()) {
@@ -166,8 +175,11 @@ public class SignupActivity extends AppCompatActivity {
                         correct = false;
                 }
                 if (correct) {
+                    //Cuando es correcto se guardan en la base de datos
                     DatabaseHelper db = new DatabaseHelper(getApplicationContext());
                     //TODO Que no se pueda repetir el username.
+                    db.clearDB();
+                    db.initDB();
                     try {
                         db.createPerson(new Person(nameEdit.getText().toString(), usernameEdit.getText().toString(), Integer.parseInt(ageEdit.getText().toString()), genre, Float.parseFloat(heightEdit.getText().toString())));
                         db.createAccount(new Account(usernameEdit.getText().toString(), passwordEdit.getText().toString()));
@@ -187,6 +199,11 @@ public class SignupActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Comprueba si un texto es valido
+     * @param text texto a comprobar
+     * @return true si es valido, false si no lo es
+     */
     private boolean isTextValid(@Nullable Editable text) {
         return text != null && text.length() > 0;
     }

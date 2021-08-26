@@ -9,6 +9,11 @@
         <item name="android:textColorPrimary">@color/textColorPrimary</item>
     </style>
 
+    <style name="Theme.Shirne.Slidr" parent="Theme.Shrine">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
     <style name="Widget.Shrine.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="hintTextAppearance">@style/TextAppearance.Shrine.TextInputLayout.HintText</item>
         <item name="hintTextColor">@color/textColorPrimary</item>

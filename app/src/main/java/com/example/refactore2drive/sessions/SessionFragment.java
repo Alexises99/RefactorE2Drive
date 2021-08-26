@@ -15,6 +15,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -23,6 +24,7 @@ import android.widget.TextView;
 
 import com.example.refactore2drive.Helper;
 import com.example.refactore2drive.R;
+import com.example.refactore2drive.activities.MoreInfoActivity;
 import com.example.refactore2drive.database.DatabaseHelper;
 import com.example.refactore2drive.models.Discapacity;
 import com.example.refactore2drive.models.Disease;
@@ -97,6 +99,7 @@ public class SessionFragment extends Fragment {
             endSession.setEnabled(true);
             Intent intent = new Intent(getActivity(), BluetoothServiceOBD.class);
             intent.putExtra("deviceAddress",db.getObd(username).getAddress());
+            intent.putExtra("mode", true);
             getActivity().startService(intent);
             LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent(ACTION_SESSION_START));
             String iniTime = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
@@ -156,6 +159,16 @@ public class SessionFragment extends Fragment {
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.more_info:
+                startActivity(new Intent(getActivity(), MoreInfoActivity.class));
+                return true;
+            default:
+                return false;
+        }
+    }
 
     private class SessionListAdapter extends BaseAdapter {
         private final ArrayList<SessionModel> mSessions;

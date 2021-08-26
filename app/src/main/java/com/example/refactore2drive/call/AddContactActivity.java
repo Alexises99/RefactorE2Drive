@@ -21,6 +21,8 @@ import java.util.List;
 
 public class AddContactActivity extends AppCompatActivity implements NavigationHost {
 
+    public static final String ACTION_ADD_CONTACT = "com.example_ACTION_ADD_CONTACT";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,12 +44,14 @@ public class AddContactActivity extends AppCompatActivity implements NavigationH
                     textInputLayout.setError(null);
                 }
             }
-
+            /**
+             * Se envia el contacto al fragmento para que el lo guarde y muestre por pantalla
+             */
             if (noErrors) {
                 TextInputEditText e1 = findViewById(R.id.edit_name);
                 TextInputEditText e2 = findViewById(R.id.edit_number);
                 Bundle bundle = new Bundle();
-                Intent intent = new Intent("SEND_CONTACT");
+                Intent intent = new Intent(ACTION_ADD_CONTACT);
                 Contact contact = new Contact(e1.getText().toString(), e2.getText().toString());
                 bundle.putSerializable("contact", contact);
                 intent.putExtras(bundle);
@@ -68,6 +72,10 @@ public class AddContactActivity extends AppCompatActivity implements NavigationH
         }
         transaction.commit();
     }
+
+    /**
+     * Implementación de Contact de manera serializable para poder ser enviado al fragmento
+     */
 
     public class Contact implements Serializable {
         private final String name, number;

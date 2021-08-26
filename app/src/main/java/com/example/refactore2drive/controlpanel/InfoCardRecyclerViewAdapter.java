@@ -11,9 +11,14 @@ import com.example.refactore2drive.R;
 
 import java.util.List;
 
-public class InfoCardRecyclerViewAdapter extends RecyclerView.Adapter<InfoCardViewHolder>{
+public class InfoCardRecyclerViewAdapter extends RecyclerView.Adapter<InfoCardViewHolder> {
+
     private List<InfoEntry> infoEntryList;
 
+    /**
+     * Adaptador para la vista de las tarjetas
+     * @param infoEntryList lista de datos a mostrar
+     */
     InfoCardRecyclerViewAdapter(List<InfoEntry> infoEntryList) {
         this.infoEntryList = infoEntryList;
     }

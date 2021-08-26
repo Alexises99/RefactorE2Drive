@@ -15,6 +15,11 @@ public class ContactCardRecyclerViewAdapter extends RecyclerView.Adapter<Contact
     public List<ContactEntry> contactEntryList;
     private final OnItemClickListener listener;
 
+    /**
+     * Constructor del adaptador que se encarga de recoger todos los contactos y el listener
+     * @param contactEntryList todos los contactos a mostrar
+     * @param listener para poder escuchar el evento onClick
+     */
     ContactCardRecyclerViewAdapter(List<ContactEntry> contactEntryList, OnItemClickListener listener) {
         this.contactEntryList = contactEntryList;
         this.listener =  listener;

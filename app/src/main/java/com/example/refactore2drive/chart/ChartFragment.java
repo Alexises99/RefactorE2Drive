@@ -1,6 +1,7 @@
 package com.example.refactore2drive.chart;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -21,6 +23,7 @@ import android.widget.EditText;
 
 import com.example.refactore2drive.Helper;
 import com.example.refactore2drive.R;
+import com.example.refactore2drive.activities.MoreInfoActivity;
 import com.example.refactore2drive.database.DatabaseHelper;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -89,6 +92,9 @@ public class ChartFragment extends Fragment {
         super.onCreateOptionsMenu(menu, menuInflater);
     }
 
+    /**
+     * Este metodo crea para cada segundo del dia un tiempo asociado para que se muestre como eje x
+     */
     private void populate() {
         quarters = new HashMap<>();
         for (int i = 0; i < 86400; i++) {
@@ -96,6 +102,11 @@ public class ChartFragment extends Fragment {
         }
     }
 
+    /**
+     * Permite pasar de la clase value que no puede ser representada a la clase Entry que si
+     * @param values todos los valores a representar
+     * @return lista con todos los valores listos para ser representados
+     */
     private ArrayList<Entry> process(ArrayList<Value> values) {
         ArrayList<Entry> dataList = new ArrayList<>();
         for (Value value : values) {
@@ -105,6 +116,13 @@ public class ChartFragment extends Fragment {
         return dataList;
     }
 
+    /**
+     * Configura los ejes de la grafica
+     * @param xAxis
+     * @param yAxisLeft
+     * @param yAxisRight
+     * @param formatter para reemplazar el valor original del eje x
+     */
     private void configureAxis(XAxis xAxis, YAxis yAxisLeft, YAxis yAxisRight, ValueFormatter formatter) {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setTextSize(13f);
@@ -131,10 +149,20 @@ public class ChartFragment extends Fragment {
         lineDataSet.setValueTextSize(10);
     }
 
+    /**
+     * Recupera de la Base de Datos todos los datos del consumo de la fecha indicada
+     * @param date fecha en la que queremos los datos
+     * @return todos los datos del consumo en esa fecha
+     */
     private List<Value> getDataConsume(LocalDate date) {
         return db.getDataConsumeByDate(username, date.toString());
     }
 
+    /**
+     * Recupera de la Base de Datos todos los datos de la velocidad de la fecha indicada
+     * @param date fecha en la que queremos los datos
+     * @return todos los datos de la velocidad en esa fecha
+     */
     private List<Value> getDataSpeed(LocalDate date) {
         return db.getDataSpeedByDate(username, date.toString());
     }
@@ -148,41 +176,73 @@ public class ChartFragment extends Fragment {
         legend.setYEntrySpace(5f);
     }
 
+    /**
+     * Dibuja el grafico en la UI
+     * @param date
+     */
     private void drawChart(LocalDate date) {
+        /*
+        Para añadir más entradas a la grafica unicamente habria que repetir el proceso
+         */
+
+        //Todos los valores de una fecha indicada y ya procesados como Entry del consumo
         ArrayList<Value> values = new ArrayList<>(getDataConsume(date));
         ArrayList<Entry> list = process(values);
+
+        //Todos los valores de una fecha indicada y ya procesados como Entry de la velocidad
         ArrayList<Value> values1 = new ArrayList<>(getDataSpeed(date));
-        Log.d("Lista1", values1.toString());
         ArrayList<Entry> list1 = process(values1);
-        Log.d("process1", list1.toString());
+
+        //Nueva linea de datos y su etiqueta
         LineDataSet lineDataSet = new LineDataSet(list, "Consumo");
         LineDataSet lineDataSet1 = new LineDataSet(list1, "Velocidad");
+
+        //Configuración de ambas lineas
         configureLine(lineDataSet, 76, 146, 177);
         configureLine(lineDataSet1, 228,142,88);
+
+        //Union de todas en una estructura de datos
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
-        //dataSets.add(lineDataSet);
+        dataSets.add(lineDataSet);
         dataSets.add(lineDataSet1);
+
+        //Linea de datos final
         LineData data = new LineData(dataSets);
+
+        //Formato del eje x para que corresponda con un tiempo y no con el número de segundos
         ValueFormatter formatter = new ValueFormatter() {
             @Override
             public String getAxisLabel(float value, AxisBase axis) {
                 return quarters.get((int) value);
             }
         };
+
         XAxis xAxis = chart.getXAxis();
         YAxis yAxisLeft = chart.getAxisLeft();
         YAxis yAxisRight = chart.getAxisRight();
+
+        //Configuración
         configureAxis(xAxis, yAxisLeft, yAxisRight, formatter);
         Legend legend = chart.getLegend();
         configureLegend(legend);
+
+        //Actualizar los datos del grafico y refrescarlo para que se muestren
         chart.setData(data);
         chart.invalidate();
     }
 
+    /**
+     * Permite obtener de un dia o mes su 0 correspondiente. Ejemplo: twoDigits(1) -> 01
+     * @param n numero que queremos formatear
+     * @return String con el 0 delante
+     */
     private String twoDigits(int n) {
         return (n<=9) ? ("0"+n) : String.valueOf(n);
     }
 
+    /**
+     * Muestra el dialogo de selección de fecha
+     */
     private void showDatePickerDialog() {
         DatePickerFragment newFragment = DatePickerFragment.newInstance((datePicker, year, month, day) -> {
             final String selectedDate = year + "-" + twoDigits(month+1) + "-" + twoDigits(day);
@@ -200,6 +260,17 @@ public class ChartFragment extends Fragment {
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         if (activity != null) {
             activity.setSupportActionBar(toolbar);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.more_info:
+                startActivity(new Intent(getActivity(), MoreInfoActivity.class));
+                return true;
+            default:
+                return false;
         }
     }
 }

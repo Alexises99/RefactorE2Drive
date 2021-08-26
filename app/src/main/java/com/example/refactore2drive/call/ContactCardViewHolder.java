@@ -17,7 +17,10 @@ public class ContactCardViewHolder extends RecyclerView.ViewHolder {
     public ImageView icon;
     public Button button;
 
-
+    /**
+     * Representa a un contacto con todos sus parametros
+     * @param itemView esta definido en el xml ya que es una vista por si solo
+     */
     public ContactCardViewHolder(@NonNull View itemView) {
         super(itemView);
         name = itemView.findViewById(R.id.title_card_call);
@@ -26,6 +29,11 @@ public class ContactCardViewHolder extends RecyclerView.ViewHolder {
         button = itemView.findViewById(R.id.but_call);
     }
 
+    /**
+     * Permite poner los valores correspondientes
+     * @param contactEntry el contacto
+     * @param listener para escuchar el evento onClick
+     */
     public void bind(final ContactEntry contactEntry, final OnItemClickListener listener) {
         name.setText(contactEntry.name);
         number.setText(contactEntry.number);

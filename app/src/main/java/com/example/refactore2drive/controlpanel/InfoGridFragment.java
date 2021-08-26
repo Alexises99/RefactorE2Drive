@@ -57,6 +57,11 @@ public class InfoGridFragment extends Fragment {
     private String username;
     private boolean sessionStarted;
 
+    /**
+     * Para poder instanciar con un parametro
+     * @param param1 valor de la direccion MAC de la pulsera
+     * @return Fragmento
+     */
     public static InfoGridFragment newInstance(String param1) {
         InfoGridFragment fragment = new InfoGridFragment();
         Bundle args = new Bundle();
@@ -87,23 +92,33 @@ public class InfoGridFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_info_grid, container, false);
         setUpToolbar(view);
         if (mBluetoothLeService != null){
+            //Conexión con la pulsera
             final boolean result = mBluetoothLeService.connect(mParam1);
             Log.d("Result", String.valueOf(result));
         }
+
+        //Inicialización de la vista
         statusText = view.findViewById(R.id.status_obd);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+
+        //Configuración del recycler view
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false));
+        //Inicialización de la lista
         infoEntryList = InfoEntry.initList();
         adapter = new InfoCardRecyclerViewAdapter(infoEntryList);
         recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new InfoGridItemDecoration(8,4));
+
         return view;
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        /*
+        Cada vez que el fragmento no es visible liberamos recursos
+         */
         Log.d("BAck", "estoy en el back");
         try {
             getActivity().unbindService(mServiceConnection);
@@ -122,31 +137,45 @@ public class InfoGridFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d("holaa", "aka andi");
+
+        //Obtenemos la base de datos y el usuario
         db = new DatabaseHelper(getActivity());
         username = Helper.getUsername(getActivity());
-        bm = LocalBroadcastManager.getInstance(getActivity());
-        Log.d("Conectando", "Conectandi");
-        Intent gattServiceIntent = new Intent(getActivity(), BluetoothLeService.class);
 
+        //Obtenemos el BroadcastManager para controlar la recepción de mensajes
+        bm = LocalBroadcastManager.getInstance(getActivity());
+
+        //Conexión con el servicio de la pulsera
+        Intent gattServiceIntent = new Intent(getActivity(), BluetoothLeService.class);
         try{
             getActivity().bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
         } catch (NullPointerException e) {
             Log.e("error", "error inesperado");
         }
 
+        //Iniciación de los filtros que manejaran los intents
         IntentFilter dataReceiver = startFilterObd();
         IntentFilter heartReceiver = startFilterHearth();
         IntentFilter status = startFilterStatus();
+
+        //Registro de estos en el BroadcastManager
         bm.registerReceiver(onStatusReceiver,status);
         bm.registerReceiver(onDataReceived, dataReceiver);
         bm.registerReceiver(mGattUpdateReceiver, heartReceiver);
+
+        //Comprobación de que el servicio no se este ejecutando ahora mismo y si no es así lanzarlo
         if (!BluetoothServiceOBD.isRunning) {
             Intent intent = new Intent(getActivity(), BluetoothServiceOBD.class);
+            intent.putExtra("mode", false);
             intent.putExtra("deviceAddress",db.getObd(username).getAddress());
             getActivity().startService(intent);
         }
     }
 
+    /**
+     * Este filtro se encarga de recibir los datos de la clase OBDConsumer y escuchar sus acciones
+     * @return El filtro inicializado
+     */
     private IntentFilter startFilterObd() {
         IntentFilter dataReceiver = new IntentFilter();
         dataReceiver.addAction(OBDConsumer.ACTION_SEND_DATA_TEMP);
@@ -156,6 +185,11 @@ public class InfoGridFragment extends Fragment {
         return dataReceiver;
     }
 
+    /**
+     * Este filtro se encarga de recibir los datos del servicio que controla la pulsera y escuchar
+     * sus acciones
+     * @return El filtro inicializado
+     */
     private IntentFilter startFilterHearth() {
         IntentFilter heartReceiver = new IntentFilter();
         heartReceiver.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
@@ -166,6 +200,10 @@ public class InfoGridFragment extends Fragment {
         return heartReceiver;
     }
 
+    /**
+     * Este filtro se encarga de recibir las actualizaciones del estado de conexión del OBD
+     * @return El filtro inicializado
+     */
     private IntentFilter startFilterStatus() {
         IntentFilter status = new IntentFilter();
         status.addAction(BluetoothServiceOBD.ACTION_CONNECTION_FAILED);
@@ -178,6 +216,11 @@ public class InfoGridFragment extends Fragment {
     }
 
     //OBD
+    /**
+     * Maneja todos los estados de conexión del obd y cuando se inicia una sesión o no
+     * IMPORTANTE: Controlar aqui que se haya iniciado una sesión nos sirve para controlar que no
+     * detengamos el servicio en ningún momento mientras la sesión este activa
+     */
     private final BroadcastReceiver onStatusReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -207,6 +250,10 @@ public class InfoGridFragment extends Fragment {
             }
         }
     };
+
+    /**
+     * Maneja todas las acciones que envia el OBDConsumer
+     */
     private final BroadcastReceiver onDataReceived = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -215,12 +262,23 @@ public class InfoGridFragment extends Fragment {
                 String data;
                 switch (action) {
                     case OBDConsumer.ACTION_SEND_DATA_CONSUME:
+                        //Cogemos el dato
                         data = intent.getStringExtra("dataConsume");
+
+                        //Actualizamos el dato en la UI
                         updateSingleItem(data, 3);
                         long res = 0;
+
+                        //Formateamos el valor para eliminar la unidad y a la vez cambiar la , por el .
                         if (data.length() == 6) res = (long) Float.parseFloat(data.substring(0,3).replace(",","."));
                         else if (data.length() == 7) res = (long) Float.parseFloat(data.substring(0,4).replace(",","."));
 
+                        //Comprobamos que el valor no haya sido el mismo que el anterior
+                        /*
+                        El valor anterior esta guardado en la actividad principal ya que si lo mantenemos
+                        en el Fragmento cada vez que salgamos de el se eliminara y no sera valido.
+                        La actividad principal casi siempre esta en ejecución.
+                         */
                         if (MainActivity.prevConsume == -1) createDataConsume(res);
                         else if (MainActivity.prevConsume != res) createDataConsume(res);
                         break;
@@ -244,6 +302,10 @@ public class InfoGridFragment extends Fragment {
         }
     };
 
+    /**
+     * Creamos el valor para un número dado
+     * @param res1
+     */
     private void createDataSpeed(long res1) {
         MainActivity.prevSpeed = res1;
         int x1 = Helper.formatTime(LocalTime.now());
@@ -251,6 +313,10 @@ public class InfoGridFragment extends Fragment {
         db.createDataSpeed(value1);
     }
 
+    /**
+     * Creamos el valor para un número dado
+     * @param res
+     */
     private void createDataConsume(long res) {
         MainActivity.prevConsume = res;
         int x = Helper.formatTime(LocalTime.now());
@@ -258,6 +324,11 @@ public class InfoGridFragment extends Fragment {
         db.createDataConsume(value);
     }
 
+    /**
+     * Actualiza el elemento en la UI
+     * @param data datos a actualizar
+     * @param pos posición en la lista
+     */
     private void updateSingleItem(String data, int pos) {
         InfoEntry entry= infoEntryList.get(pos);
         entry.value = data;

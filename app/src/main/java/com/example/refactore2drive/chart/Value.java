@@ -1,6 +1,9 @@
 package com.example.refactore2drive.chart;
 
-
+/**
+ * Representacion de la clase Entry pero con más datos para poder guardar datos en la BD y poder
+ * recuperarlos por fecha
+ */
 public class Value {
     private long x, y;
     private String nickname, date;
@@ -9,6 +12,14 @@ public class Value {
     public Value() {
 
     }
+
+    /**
+     * Un nuevo punto para el grafico
+     * @param x valor eje X (tiempo)
+     * @param y valor eje Y
+     * @param nickname nombre del usuario al que pertenece
+     * @param date fecha de la medición
+     */
     public Value (long x, long y, String nickname, String date) {
         this.x = x;
         this.y = y;

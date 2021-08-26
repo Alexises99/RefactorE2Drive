@@ -12,6 +12,11 @@ public class DatePickerFragment extends DialogFragment {
 
     private DatePickerDialog.OnDateSetListener listener;
 
+    /**
+     * Crea una nueva instancia del DatePicker con un listener asociado
+     * @param listener interfaz para poder escuchar los cambios en el DatePicker
+     * @return un Fragment con el DatePicker
+     */
     public static DatePickerFragment newInstance(DatePickerDialog.OnDateSetListener listener) {
         DatePickerFragment fragment = new DatePickerFragment();
         fragment.setListener(listener);

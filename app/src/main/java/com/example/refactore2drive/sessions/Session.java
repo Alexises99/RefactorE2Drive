@@ -19,7 +19,16 @@ public class Session {
     private static final int WRITE_EXTERNAL_STORAGE = 0;
     private static final int REQUEST_PERMISSION = 0;
 
-
+    /**
+     * Representa lo que es una Sesion
+     * @param name nombre de la sesión
+     * @param comments comentarios introducidos
+     * @param path ruta donde se va a guardar
+     * @param headers cabeceras de los datos
+     * @param info información de la persona
+     * @throws IOException
+     * @throws ErrorSDException
+     */
     public Session(String name, String[] comments, String path, String[] headers, String[] info) throws IOException, ErrorSDException {
         this.comments = comments;
         this.startHour = formatter(LocalDateTime.now());
@@ -58,11 +67,20 @@ public class Session {
         return comments;
     }
 
+    /**
+     * Formatea el dato a un formato más visible
+     * @param time tiempo y fecha a actualizar
+     * @return string ya formateado
+     */
     public String formatter(LocalDateTime time) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return time.format(formatter);
     }
 
+    /**
+     * Comprueba si tiene los permisos para escribir y leer
+     * @return [0] esta disponible el externalStorage, [1] si se puede escribir, [2] si se puede leer
+     */
     public Boolean[] checkExternalStorage() {
         boolean isAvailable = false;
         boolean isWritable = false;

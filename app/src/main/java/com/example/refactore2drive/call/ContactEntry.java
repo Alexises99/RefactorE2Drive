@@ -7,6 +7,11 @@ public class ContactEntry {
     public String number;
     public int resourceId;
 
+    /**
+     * Representa el modelo de un contacto
+     * @param name
+     * @param number
+     */
     public ContactEntry(String name, String number) {
         this.name = name;
         this.number = number;

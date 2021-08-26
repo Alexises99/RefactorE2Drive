@@ -15,6 +15,10 @@ public class InfoCardViewHolder extends RecyclerView.ViewHolder {
     public TextView infoValue;
     public ImageView imageView;
 
+    /**
+     * Representacion de una card con sus correspondiented valores y su inicialización
+     * @param itemView vista a actualizar
+     */
     public InfoCardViewHolder(@NonNull View itemView) {
         super(itemView);
         infoTitle = itemView.findViewById(R.id.title_card_info);

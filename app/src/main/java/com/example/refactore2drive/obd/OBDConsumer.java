@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 public class OBDConsumer implements Runnable{
@@ -33,22 +32,37 @@ public class OBDConsumer implements Runnable{
     private HashMap<String, String> commandResults;
     private HashMap<String, String> filter;
     public ArrayList<String> collectedData;
+    private boolean mode;
 
-    public OBDConsumer(BlockingQueue<OBDCommandJob> queue,Context context) {
+    /**
+     * Consumidor de comandos de la cola
+     * @param queue cola donde extrae los comandos
+     * @param context contexto de ejecución de la actividad
+     * @param mode true si esta una sesión iniciada, false sino
+     */
+    public OBDConsumer(BlockingQueue<OBDCommandJob> queue,Context context, boolean mode) {
         this.queue = queue;
         isConnected = true;
         this.context = context;
         commandResults = new HashMap<>();
         filter = Helper.initFilter();
         collectedData = new ArrayList<>();
+        this.mode = mode;
     }
 
     @Override
     public void run() {
+        /*
+        Mantenemos un bucle infinito, mientras no se interrumpa el hilo extraemos trabajos,
+        comprobamos el estado y si es correcto mandamos a otro metodo que se encargara de actua
+        lizar en la UI
+         */
         while(!Thread.currentThread().isInterrupted()) {
             OBDCommandJob job = null;
             try {
+                //Obtenemos el trabajo de la cola
                 job = queue.take();
+                //Comprobamos el estado
                 if (job.getState().equals(OBDCommandJob.ObdCommandJobState.NEW)) {
                     job.setState(OBDCommandJob.ObdCommandJobState.RUNNING);
                     if (isConnected)
@@ -68,7 +82,6 @@ public class OBDConsumer implements Runnable{
                             Intent intent = new Intent(ACTION_DISCONNECTED);
                             LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                             Thread.currentThread().interrupt();
-
                         }
                         else job.setState(OBDCommandJob.ObdCommandJobState.EXECUTION_ERROR);
                     } catch (NullPointerException e) {
@@ -88,6 +101,12 @@ public class OBDConsumer implements Runnable{
         }
     }
 
+    /**
+     * Notifica al InfoFragment de los cambios para reflejarlos en la UI
+     * @param data datos a actualizar
+     * @param action accion a enviar
+     * @param param nombre del parametro a enviar
+     */
     private void notifyFragment(final String data, final String action, final String param) {
         Intent intent = new Intent(action);
         Bundle bundle = new Bundle();
@@ -96,6 +115,11 @@ public class OBDConsumer implements Runnable{
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
+    /**
+     * Busca si el comando es valido entre todos los existentes
+     * @param txt nombre del comano
+     * @return nombre del comando en caso de que exista, si no el txt
+     */
     public static String LookUpCommand(String txt) {
         for (AvailableCommandNames item : AvailableCommandNames.values()) {
             if (item.getValue().equals(txt)) {
@@ -105,6 +129,10 @@ public class OBDConsumer implements Runnable{
         return txt;
     }
 
+    /**
+     * Comprobamos que sea correcto el job y lo procesamos
+     * @param job
+     */
     public void stateUpdate(final OBDCommandJob job) {
         if (job == null) return;
         final String cmdName = job.getCommand().getName();
@@ -125,6 +153,7 @@ public class OBDConsumer implements Runnable{
         } else {
             cmdResult = job.getCommand().getFormattedResult();
         }
+        //Comprobamos el comando del que se trata y lo notificamos
         switch (cmdID) {
             case "AMBIENT_AIR_TEMP":
                 notifyFragment(cmdResult,ACTION_SEND_DATA_TEMP,"dataTemp");
@@ -139,44 +168,61 @@ public class OBDConsumer implements Runnable{
                 notifyFragment(cmdResult, ACTION_SEND_DATA_CONSUME, "dataConsume");
                 break;
         }
+        //Actualizamos el HashMap con todos los valores
+        /*
+        TODO optimizar commandResults
+        if (mode) ´{
+            commandResults.put(cmdName, cmdResult);
+            if ( commandResults.size() ... ) {
+                ...
+            }
+         }
+         ¿¿Es mas eficiente ya que no llenamos con algo que sin sesion da igual??
+         */
         commandResults.put(cmdName, cmdResult);
-        if (commandResults.size() >= Headers.headers.length) {
+        if (commandResults.size() >= Headers.headers.length && mode) {
+            //Lanzamos un hilo que se encarga de procesar los datos y enviarlos al servicio de la sesión
             (new Thread() {
                 @Override
                 public void run() {
                     processCollectedData();
-                    try{
-                        sleep(1000);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
-
                 }
             }).start();
         }
     }
 
+    /**
+     * Procesa todos los datos
+     */
     private void processCollectedData() {
+        //Crea un vector con la misma longuitud que las cabeceras + 1 que sera la del instante de tiempo
         String[] results = new String[Headers.headers.length + 1];
+        //Asignamos el instante de tiempo
         results[0] = LocalDateTime.now().toString();
         int i = 1;
+        //Recorremos todas las cabeceras, cogemos la unidad correspondiente y el valor del dato recogido del mismo tipo
         for (String header : Headers.headers) {
             String unit = filter.get(header);
             String value = commandResults.get(header);
             try {
+                //formateamos el valor
                 value = value.replace(unit, "");
                 value = value.replace(",", ".");
                 results[i] = value;
                 i++;
             } catch (NullPointerException e) {
+                //En caso de que no exista se introducen ""
                 results[i] = "";
                 i++;
             }
         }
+        //Añadimos los elementos a la lista
         Arrays.stream(results).forEach(value -> collectedData.add(value));
         if(collectedData.size() > 10) {
+            //Cada vez que estemos aqui enviaremos los datos recolectados al servicio
             Log.d("Colectado", " " + collectedData.size());
             Intent intent = new Intent(ACTION_SEND_DATA_OBD_SESSION);
+            //Hay que hacer una copia de collectedData porque si no, no se envia xDDD no tiene sentido
             ArrayList<String> list = new ArrayList<>();
             for (String data : collectedData) {
                 list.add(data);
