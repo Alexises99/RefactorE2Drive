@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linear_dev"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.DeveloperModeActivity"
@@ -13,8 +14,8 @@
         android:text="Lista de todos los comandos soportados"
         android:gravity="center_horizontal" />
 
-    <ListView
-        android:id="@+id/list_commands_dev"
+    <TableLayout
+        android:id="@+id/table_commands_dev"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:divider="@null"

@@ -3,13 +3,20 @@ package com.example.refactore2drive.obd;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.refactore2drive.Helper;
+import com.example.refactore2drive.MessageEvent;
+import com.example.refactore2drive.MessageEventGrid;
+import com.example.refactore2drive.activities.DeveloperModeActivity;
 import com.example.refactore2drive.sessions.Headers;
 import com.github.pires.obd.enums.AvailableCommandNames;
 import com.github.pires.obd.exceptions.UnsupportedCommandException;
+
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -33,6 +40,7 @@ public class OBDConsumer implements Runnable{
     private HashMap<String, String> filter;
     public ArrayList<String> collectedData;
     private boolean mode;
+    private boolean modeDev;
 
     /**
      * Consumidor de comandos de la cola
@@ -40,7 +48,7 @@ public class OBDConsumer implements Runnable{
      * @param context contexto de ejecución de la actividad
      * @param mode true si esta una sesión iniciada, false sino
      */
-    public OBDConsumer(BlockingQueue<OBDCommandJob> queue,Context context, boolean mode) {
+    public OBDConsumer(BlockingQueue<OBDCommandJob> queue,Context context, boolean mode, boolean modeDev) {
         this.queue = queue;
         isConnected = true;
         this.context = context;
@@ -48,6 +56,7 @@ public class OBDConsumer implements Runnable{
         filter = Helper.initFilter();
         collectedData = new ArrayList<>();
         this.mode = mode;
+        this.modeDev = modeDev;
     }
 
     @Override
@@ -108,11 +117,12 @@ public class OBDConsumer implements Runnable{
      * @param param nombre del parametro a enviar
      */
     private void notifyFragment(final String data, final String action, final String param) {
-        Intent intent = new Intent(action);
+        /*Intent intent = new Intent(action);
         Bundle bundle = new Bundle();
         bundle.putString(param,data);
         intent.putExtras(bundle);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);*/
+        EventBus.getDefault().post(new MessageEventGrid(param, data));
     }
 
     /**
@@ -154,21 +164,24 @@ public class OBDConsumer implements Runnable{
             cmdResult = job.getCommand().getFormattedResult();
         }
         //Comprobamos el comando del que se trata y lo notificamos
-        switch (cmdID) {
-            case "AMBIENT_AIR_TEMP":
-                notifyFragment(cmdResult,ACTION_SEND_DATA_TEMP,"dataTemp");
-                break;
-            case "FUEL_LEVEL":
-                notifyFragment(cmdResult, ACTION_SEND_DATA_FUEL, "dataFuel");
-                break;
-            case "SPEED":
-                notifyFragment(cmdResult, ACTION_SEND_DATA_SPEED, "dataSpeed");
-                break;
-            case "FUEL_CONSUMPTION_RATE":
-                notifyFragment(cmdResult, ACTION_SEND_DATA_CONSUME, "dataConsume");
-                break;
-        }
-        //Actualizamos el HashMap con todos los valores
+        final String copy = cmdResult;
+        if (modeDev) EventBus.getDefault().post(new MessageEvent(cmdName, cmdID, copy));
+        else {
+            switch (cmdID) {
+                case "AMBIENT_AIR_TEMP":
+                    notifyFragment(cmdResult,ACTION_SEND_DATA_TEMP,"dataTemp");
+                    break;
+                case "FUEL_LEVEL":
+                    notifyFragment(cmdResult, ACTION_SEND_DATA_FUEL, "dataFuel");
+                    break;
+                case "SPEED":
+                    notifyFragment(cmdResult, ACTION_SEND_DATA_SPEED, "dataSpeed");
+                    break;
+                case "FUEL_CONSUMPTION_RATE":
+                    notifyFragment(cmdResult, ACTION_SEND_DATA_CONSUME, "dataConsume");
+                    break;
+            }
+            //Actualizamos el HashMap con todos los valores
         /*
         TODO optimizar commandResults
         if (mode) ´{
@@ -179,15 +192,16 @@ public class OBDConsumer implements Runnable{
          }
          ¿¿Es mas eficiente ya que no llenamos con algo que sin sesion da igual??
          */
-        commandResults.put(cmdName, cmdResult);
-        if (commandResults.size() >= Headers.headers.length && mode) {
-            //Lanzamos un hilo que se encarga de procesar los datos y enviarlos al servicio de la sesión
-            (new Thread() {
-                @Override
-                public void run() {
-                    processCollectedData();
-                }
-            }).start();
+            commandResults.put(cmdName, cmdResult);
+            if (commandResults.size() >= Headers.headers.length && mode) {
+                //Lanzamos un hilo que se encarga de procesar los datos y enviarlos al servicio de la sesión
+                (new Thread() {
+                    @Override
+                    public void run() {
+                        processCollectedData();
+                    }
+                }).start();
+            }
         }
     }
 

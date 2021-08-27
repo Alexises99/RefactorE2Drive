@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 
 import com.example.refactore2drive.Helper;
 import com.example.refactore2drive.R;
+import com.example.refactore2drive.activities.DeveloperModeActivity;
 import com.example.refactore2drive.activities.MoreInfoActivity;
 import com.example.refactore2drive.activities.UserConfigActivity;
 import com.example.refactore2drive.controlpanel.InfoGridItemDecoration;
@@ -188,6 +189,9 @@ public class CallFragment extends Fragment {
                 return true;
             case R.id.settings:
                 startActivity(new Intent(requireActivity(), UserConfigActivity.class));
+                return true;
+            case R.id.developer_mode:
+                startActivity(new Intent(requireActivity(), DeveloperModeActivity.class));
                 return true;
             default:
                 return false;

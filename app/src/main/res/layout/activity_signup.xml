@@ -249,7 +249,6 @@
                 android:layout_height="wrap_content"
                 style="@style/Widget.Shrine.TextInputLayout"
                 android:hint="Patologia"
-                android:layout_toLeftOf="@id/addDisease"
                 android:layout_alignParentStart="true"
                 app:errorEnabled="true"
                 android:layout_marginEnd="8dp" >
@@ -291,7 +290,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:text="Siguiente"
                 android:id="@+id/next_button_reg" />
 
@@ -301,9 +299,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
-                android:layout_marginRight="12dp"
                 android:layout_toStartOf="@id/next_button_reg"
-                android:layout_toLeftOf="@id/next_button_reg"
                 android:text="Cancelar" />
 
         </RelativeLayout>

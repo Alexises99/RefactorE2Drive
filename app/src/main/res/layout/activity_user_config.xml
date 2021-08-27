@@ -229,7 +229,7 @@
                 android:layout_height="wrap_content"
                 style="@style/Widget.Shrine.TextInputLayout"
                 android:hint="Patologia"
-                android:layout_toLeftOf="@id/addDisease_config"
+                android:layout_toStartOf="@id/addDisease_config"
                 android:layout_alignParentStart="true"
                 app:errorEnabled="true"
                 android:layout_marginEnd="8dp" >
@@ -262,6 +262,39 @@
             android:nestedScrollingEnabled="true"
             android:dividerHeight="0dp" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:text="Dispositivo OBD" />
+
+        <TextView
+            android:id="@+id/change_obd_config"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="16sp"
+            android:text="Pulsa para listar dispositivos vinculados" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:text="Pulsera" />
+
+        <TextView
+            android:id="@+id/change_wear_config"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="16sp"
+            android:text="Pulsa para listar dispositivos vinculados" />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
@@ -271,7 +304,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:text="Guardar"
                 android:id="@+id/next_button_config" />
 
@@ -281,9 +313,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
-                android:layout_marginRight="12dp"
                 android:layout_toStartOf="@id/next_button_config"
-                android:layout_toLeftOf="@id/next_button_config"
                 android:text="Cancelar" />
 
         </RelativeLayout>

@@ -33,7 +33,9 @@ import android.widget.Toast;
 
 import com.example.refactore2drive.Helper;
 import com.example.refactore2drive.MainActivity;
+import com.example.refactore2drive.MessageEventGrid;
 import com.example.refactore2drive.R;
+import com.example.refactore2drive.activities.DeveloperModeActivity;
 import com.example.refactore2drive.activities.MoreInfoActivity;
 import com.example.refactore2drive.activities.UserConfigActivity;
 import com.example.refactore2drive.chart.Value;
@@ -42,6 +44,10 @@ import com.example.refactore2drive.heart.BluetoothLeService;
 import com.example.refactore2drive.obd.BluetoothServiceOBD;
 import com.example.refactore2drive.obd.OBDConsumer;
 import com.example.refactore2drive.sessions.SessionFragment;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -137,6 +143,18 @@ public class InfoGridFragment extends Fragment {
             bm.unregisterReceiver(mGattUpdateReceiver);
             db.closeDB();
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 
     @Override
@@ -267,6 +285,41 @@ public class InfoGridFragment extends Fragment {
         }
     };
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageRecivedConsume(MessageEventGrid messageEventGrid) {
+        switch (messageEventGrid.param) {
+            case "dataSpeed":
+                updateSingleItem(messageEventGrid.result, 0);
+                long res1 = 0;
+                if (messageEventGrid.result.length() == 7) res1 = Long.parseLong(messageEventGrid.result.substring(0,3));
+                else if (messageEventGrid.result.length() == 6) res1 = Long.parseLong(messageEventGrid.result.substring(0,2));
+                else if (messageEventGrid.result.length() == 5) res1 = Long.parseLong(messageEventGrid.result.substring(0,1));
+
+                if (MainActivity.prevSpeed == -1) createDataSpeed(res1);
+                else if (MainActivity.prevSpeed != res1) createDataSpeed(res1);
+                break;
+            case "dataTemp":
+                updateSingleItem(messageEventGrid.result, 1);
+                break;
+            case "dataConsume":
+                updateSingleItem(messageEventGrid.result, 3);
+                long res = 0;
+
+                //Formateamos el valor para eliminar la unidad y a la vez cambiar la , por el .
+                if (messageEventGrid.result.length() == 6) res = (long) Float.parseFloat(messageEventGrid.result.substring(0,3).replace(",","."));
+                else if (messageEventGrid.result.length() == 7) res = (long) Float.parseFloat(messageEventGrid.result.substring(0,4).replace(",","."));
+
+                //Comprobamos que el valor no haya sido el mismo que el anterior
+                        /*
+                        El valor anterior esta guardado en la actividad principal ya que si lo mantenemos
+                        en el Fragmento cada vez que salgamos de el se eliminara y no sera valido.
+                        La actividad principal casi siempre esta en ejecución.
+                         */
+                if (MainActivity.prevConsume == -1) createDataConsume(res);
+                else if (MainActivity.prevConsume != res) createDataConsume(res);
+                break;
+        }
+    }
     /**
      * Maneja todas las acciones que envia el OBDConsumer
      */
@@ -435,6 +488,9 @@ public class InfoGridFragment extends Fragment {
                 return true;
             case R.id.settings:
                 startActivity(new Intent(requireActivity(), UserConfigActivity.class));
+                return true;
+            case R.id.developer_mode:
+                startActivity(new Intent(requireActivity(), DeveloperModeActivity.class));
                 return true;
             default:
                 return false;

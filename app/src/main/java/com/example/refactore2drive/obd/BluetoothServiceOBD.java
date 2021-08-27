@@ -59,6 +59,7 @@ public class BluetoothServiceOBD extends Service {
     private Thread consumer;
     public static boolean isRunning;
     private boolean mode;
+    private boolean modeDev;
 
     @Override
     public void onCreate() {
@@ -95,6 +96,7 @@ public class BluetoothServiceOBD extends Service {
         mejor no esta activo si no hay una sesión iniciada
          */
         mode = intent.getBooleanExtra("mode", false);
+        modeDev = intent.getBooleanExtra("dev", false);
         //Actualización del estado del servicio
         checkBt(deviceName);
         return super.onStartCommand(intent, flags, startId);
@@ -292,7 +294,7 @@ public class BluetoothServiceOBD extends Service {
         initializeList();
         producer = new Thread(new OBDProducer(jobsQueue,obdCommands));
         producer.start();
-        consumer = new Thread(new OBDConsumer(jobsQueue, getApplicationContext(), mode));
+        consumer = new Thread(new OBDConsumer(jobsQueue, getBaseContext(), mode, modeDev));
         consumer.start();
         Log.d(TAG, "THREADS CREADOS");
     }
