@@ -13,7 +13,7 @@ import java.util.List;
 
 public class InfoCardRecyclerViewAdapter extends RecyclerView.Adapter<InfoCardViewHolder> {
 
-    private List<InfoEntry> infoEntryList;
+    private final List<InfoEntry> infoEntryList;
 
     /**
      * Adaptador para la vista de las tarjetas

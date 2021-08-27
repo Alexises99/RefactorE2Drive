@@ -7,15 +7,15 @@ public class Person {
     String nickname;
     int age;
     String genre;
-    float height;
-    float weight; //NULL
+    int height;
+    int weight; //NULL
     long id;
 
     public Person() {
 
     }
 
-    public Person(@NonNull String name, String nickname, int age, String genre, float height) {
+    public Person(@NonNull String name, String nickname, int age, String genre, int height) {
         this.name = name;
         this.nickname = nickname;
         this.age = age;
@@ -23,7 +23,7 @@ public class Person {
         this.height = height;
     }
 
-    public Person(String name, String nickname,int age, String genre, float height, long id) {
+    public Person(String name, String nickname,int age, String genre, int height, long id) {
         this.name = name;
         this.nickname = nickname;
         this.age = age;
@@ -32,7 +32,7 @@ public class Person {
         this.id = id;
     }
 
-    public Person(String name, String nickname,int age, String genre, float height, float weight) {
+    public Person(String name, String nickname,int age, String genre, int height, int weight) {
         this.name = name;
         this.nickname = nickname;
         this.age = age;
@@ -41,15 +41,6 @@ public class Person {
         this.weight = weight;
     }
 
-    public Person(String name, String nickname,int age, String genre, float height, float weight, long id) {
-        this.name = name;
-        this.nickname = nickname;
-        this.age = age;
-        this.genre = genre;
-        this.height = height;
-        this.weight = weight;
-        this.id = id;
-    }
 
     public void setName(String name) {
         this.name = name;
@@ -63,7 +54,7 @@ public class Person {
         this.age = age;
     }
 
-    public void setHeight(float height) {
+    public void setHeight(int height) {
         this.height = height;
     }
 
@@ -71,7 +62,7 @@ public class Person {
         this.nickname = nickname;
     }
 
-    public void setWeight(float weight) {
+    public void setWeight(int weight) {
         this.weight = weight;
     }
 
@@ -83,11 +74,11 @@ public class Person {
         return name;
     }
 
-    public float getHeight() {
+    public int getHeight() {
         return height;
     }
 
-    public float getWeight() {
+    public int getWeight() {
         return weight;
     }
 

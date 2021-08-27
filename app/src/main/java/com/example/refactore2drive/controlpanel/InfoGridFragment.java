@@ -1,5 +1,6 @@
 package com.example.refactore2drive.controlpanel;
 
+import android.app.ActivityManager;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.BroadcastReceiver;
@@ -11,6 +12,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -27,11 +29,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.refactore2drive.Helper;
 import com.example.refactore2drive.MainActivity;
 import com.example.refactore2drive.R;
 import com.example.refactore2drive.activities.MoreInfoActivity;
+import com.example.refactore2drive.activities.UserConfigActivity;
 import com.example.refactore2drive.chart.Value;
 import com.example.refactore2drive.database.DatabaseHelper;
 import com.example.refactore2drive.heart.BluetoothLeService;
@@ -55,7 +59,6 @@ public class InfoGridFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private String mParam1;
     private String username;
-    private boolean sessionStarted;
 
     /**
      * Para poder instanciar con un parametro
@@ -121,11 +124,14 @@ public class InfoGridFragment extends Fragment {
          */
         Log.d("BAck", "estoy en el back");
         try {
-            getActivity().unbindService(mServiceConnection);
+            requireActivity().unbindService(mServiceConnection);
         }catch (NullPointerException e) {
             Log.e("error", "error no esperado");
         } finally {
-            if (!sessionStarted && !BluetoothServiceOBD.isRunning) getActivity().stopService(new Intent(getActivity(), BluetoothServiceOBD.class));
+            boolean isRunning = ((MainActivity) requireActivity()).isMyServiceRunning(BluetoothServiceOBD.class);
+            Log.d("El estado al parar", "" + isRunning);
+            Log.d("Valor sesion" , "" + MainActivity.sessionStarted);
+            if (!MainActivity.sessionStarted && isRunning) requireActivity().stopService(new Intent(getActivity(), BluetoothServiceOBD.class));
             bm.unregisterReceiver(onDataReceived);
             bm.unregisterReceiver(onStatusReceiver);
             bm.unregisterReceiver(mGattUpdateReceiver);
@@ -143,12 +149,12 @@ public class InfoGridFragment extends Fragment {
         username = Helper.getUsername(getActivity());
 
         //Obtenemos el BroadcastManager para controlar la recepción de mensajes
-        bm = LocalBroadcastManager.getInstance(getActivity());
+        bm = LocalBroadcastManager.getInstance(requireActivity());
 
         //Conexión con el servicio de la pulsera
         Intent gattServiceIntent = new Intent(getActivity(), BluetoothLeService.class);
         try{
-            getActivity().bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
+            requireActivity().bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
         } catch (NullPointerException e) {
             Log.e("error", "error inesperado");
         }
@@ -164,11 +170,15 @@ public class InfoGridFragment extends Fragment {
         bm.registerReceiver(mGattUpdateReceiver, heartReceiver);
 
         //Comprobación de que el servicio no se este ejecutando ahora mismo y si no es así lanzarlo
-        if (!BluetoothServiceOBD.isRunning) {
+        boolean isRunning = ((MainActivity) requireActivity()).isMyServiceRunning(BluetoothServiceOBD.class);
+        Log.d("El servicio esta en ejecucion ", "" + isRunning);
+        if (!isRunning) {
             Intent intent = new Intent(getActivity(), BluetoothServiceOBD.class);
             intent.putExtra("mode", false);
             intent.putExtra("deviceAddress",db.getObd(username).getAddress());
-            getActivity().startService(intent);
+            requireActivity().startService(intent);
+            boolean isRunning1 = ((MainActivity) requireActivity()).isMyServiceRunning(BluetoothServiceOBD.class);
+            Log.d("Ahora", "" + isRunning1);
         }
     }
 
@@ -210,8 +220,6 @@ public class InfoGridFragment extends Fragment {
         status.addAction(BluetoothServiceOBD.ACTION_CONNECTION_CONNECTED);
         status.addAction(BluetoothServiceOBD.ACTION_CONNECTION_CONNECTING);
         status.addAction(OBDConsumer.ACTION_DISCONNECTED);
-        status.addAction(SessionFragment.ACTION_SESSION_START);
-        status.addAction(SessionFragment.ACTION_SESSION_END);
         return status;
     }
 
@@ -229,7 +237,21 @@ public class InfoGridFragment extends Fragment {
                 switch (action) {
                     case OBDConsumer.ACTION_DISCONNECTED:
                         statusText.setText("Desconectado");
-                        getActivity().stopService(new Intent(getActivity(), BluetoothServiceOBD.class));
+                        requireActivity().stopService(new Intent(requireActivity(), BluetoothServiceOBD.class));
+                        try {
+                            Thread.sleep(1000);
+                            requireActivity().startService(new Intent(requireActivity(), BluetoothServiceOBD.class)
+                                    .putExtra("mode", false)
+                                    .putExtra("deviceAddress", db.getObd(username).getAddress())
+                            );
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                        if (!BluetoothServiceOBD.isRunning) Toast.makeText(
+                                requireActivity(),
+                                "Error reconectando con OBD",
+                                Toast.LENGTH_SHORT
+                            ).show();
                         break;
                     case BluetoothServiceOBD.ACTION_CONNECTION_CONNECTED:
                         statusText.setText("Conectado");
@@ -239,12 +261,6 @@ public class InfoGridFragment extends Fragment {
                         break;
                     case BluetoothServiceOBD.ACTION_CONNECTION_FAILED:
                         statusText.setText("Conexión Fallida");
-                        break;
-                    case SessionFragment.ACTION_SESSION_START:
-                        sessionStarted = true;
-                        break;
-                    case SessionFragment.ACTION_SESSION_END:
-                        sessionStarted = false;
                         break;
                 }
             }
@@ -304,7 +320,7 @@ public class InfoGridFragment extends Fragment {
 
     /**
      * Creamos el valor para un número dado
-     * @param res1
+     * @param res1 dato de la velocidad
      */
     private void createDataSpeed(long res1) {
         MainActivity.prevSpeed = res1;
@@ -315,7 +331,7 @@ public class InfoGridFragment extends Fragment {
 
     /**
      * Creamos el valor para un número dado
-     * @param res
+     * @param res dato del consumo
      */
     private void createDataConsume(long res) {
         MainActivity.prevConsume = res;
@@ -406,7 +422,7 @@ public class InfoGridFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater menuInflater) {
         menuInflater.inflate(R.menu.menu_toolbar, menu);
         super.onCreateOptionsMenu(menu, menuInflater);
     }
@@ -415,7 +431,10 @@ public class InfoGridFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.more_info:
-                startActivity(new Intent(getActivity(), MoreInfoActivity.class));
+                startActivity(new Intent(requireActivity(), MoreInfoActivity.class));
+                return true;
+            case R.id.settings:
+                startActivity(new Intent(requireActivity(), UserConfigActivity.class));
                 return true;
             default:
                 return false;

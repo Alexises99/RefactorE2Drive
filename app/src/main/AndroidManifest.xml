@@ -20,16 +20,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Shrine">
-
+        <activity
+            android:name=".activities.UserConfigActivity"
+            android:exported="true" />
         <activity
             android:name=".activities.MoreInfoActivity"
-            android:theme="@style/Theme.Shirne.Slidr"
-            android:exported="true" />
-
+            android:exported="true"
+            android:theme="@style/Theme.Shirne.Slidr" />
         <activity
             android:name=".activities.DeveloperModeActivity"
             android:exported="true" />
-
         <activity
             android:name=".login.SignupActivity"
             android:exported="true" />
@@ -42,15 +42,12 @@
         <activity
             android:name=".MainActivity"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-
         <activity
             android:name=".call.AddContactActivity"
             android:exported="true" />
@@ -58,11 +55,9 @@
         <service
             android:name=".obd.BluetoothServiceOBD"
             android:enabled="true" />
-
         <service
             android:name=".sessions.TransferDataService"
             android:enabled="true" />
-
     </application>
 
 </manifest>

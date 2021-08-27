@@ -24,6 +24,7 @@ import android.widget.EditText;
 import com.example.refactore2drive.Helper;
 import com.example.refactore2drive.R;
 import com.example.refactore2drive.activities.MoreInfoActivity;
+import com.example.refactore2drive.activities.UserConfigActivity;
 import com.example.refactore2drive.database.DatabaseHelper;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -118,9 +119,9 @@ public class ChartFragment extends Fragment {
 
     /**
      * Configura los ejes de la grafica
-     * @param xAxis
-     * @param yAxisLeft
-     * @param yAxisRight
+     * @param xAxis ejeX
+     * @param yAxisLeft ejeY
+     * @param yAxisRight ejeY derecha
      * @param formatter para reemplazar el valor original del eje x
      */
     private void configureAxis(XAxis xAxis, YAxis yAxisLeft, YAxis yAxisRight, ValueFormatter formatter) {
@@ -178,7 +179,7 @@ public class ChartFragment extends Fragment {
 
     /**
      * Dibuja el grafico en la UI
-     * @param date
+     * @param date fecha en la que se dibuja el grafico
      */
     private void drawChart(LocalDate date) {
         /*
@@ -252,7 +253,7 @@ public class ChartFragment extends Fragment {
             Log.d("Igual", "Iguales: " + selectedDate.trim().equals(LocalDate.now().toString().trim()));
             drawChart(LocalDate.of(year,month+1,day));
         });
-        newFragment.show(getActivity().getSupportFragmentManager(),"datePicker");
+        newFragment.show(requireActivity().getSupportFragmentManager(),"datePicker");
     }
 
     private void setUpToolbar(View view) {
@@ -268,6 +269,9 @@ public class ChartFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.more_info:
                 startActivity(new Intent(getActivity(), MoreInfoActivity.class));
+                return true;
+            case R.id.settings:
+                startActivity(new Intent(requireActivity(), UserConfigActivity.class));
                 return true;
             default:
                 return false;

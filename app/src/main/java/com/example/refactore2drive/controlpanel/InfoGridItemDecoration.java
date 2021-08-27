@@ -7,8 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class InfoGridItemDecoration extends RecyclerView.ItemDecoration {
-    private int largePadding;
-    private int smallPadding;
+    private final int largePadding;
+    private final int smallPadding;
 
     public InfoGridItemDecoration(int largePadding, int smallPadding) {
         this.largePadding = largePadding;

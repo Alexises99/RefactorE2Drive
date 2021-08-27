@@ -24,6 +24,8 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.Objects;
+
 public class LoginFragment extends Fragment {
 
     @Override
@@ -45,7 +47,7 @@ public class LoginFragment extends Fragment {
         //Listener que comprueba si el usuario es valido y se logea
         nextButton.setOnClickListener(view1 -> {
             //Comprobación de campos
-            if (! (usernameEdit.getText().length() > 0 && usernameEdit.getText() != null)) {
+            if (! (Objects.requireNonNull(usernameEdit.getText()).length() > 0 && usernameEdit.getText() != null)) {
                 usernameInput.setError("Campo requerido");
             }
             if (!isPasswordValid(passwordEdit.getText())) {
@@ -67,7 +69,7 @@ public class LoginFragment extends Fragment {
                         SharedPreferences.Editor editor = preferences.edit();
                         editor.putString("username", usernameEdit.getText().toString());
                         editor.apply();
-                        ((NavigationHost) getActivity()).navigateTo(new SelectOBD(), false);
+                        ((NavigationHost) requireActivity()).navigateTo(new SelectOBD(), false);
                     }
                 } catch (CursorIndexOutOfBoundsException e) {
                     Toast.makeText(getActivity(), "Usuario o contraseña incorrecta", Toast.LENGTH_SHORT).show();
@@ -79,7 +81,7 @@ public class LoginFragment extends Fragment {
         });
         //Permite eliminar el error una vez corregido
         usernameEdit.setOnKeyListener((view1, i, keyEvent) -> {
-            if (usernameEdit.getText().length() > 0 && usernameEdit.getText() != null) usernameInput.setError(null);
+            if (Objects.requireNonNull(usernameEdit.getText()).length() > 0 && usernameEdit.getText() != null) usernameInput.setError(null);
             return false;
         });
         passwordEdit.setOnKeyListener((view1, i, keyEvent) -> {

@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.CursorIndexOutOfBoundsException;
 import android.os.Bundle;
 
@@ -13,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +30,6 @@ import java.util.ArrayList;
 
 public class SelectOBD extends Fragment {
     private SwitchCompat switchCompat;
-    private ListView listView;
     private DeviceListAdapter deviceListAdapter;
     private String username;
     private DatabaseHelper db;
@@ -50,13 +46,13 @@ public class SelectOBD extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_select_o_b_d, container, false);
         switchCompat = view.findViewById(R.id.obd_switch);
-        listView = view.findViewById(R.id.obd_list);
+        ListView listView = view.findViewById(R.id.obd_list);
         deviceListAdapter = new DeviceListAdapter();
         listView.setAdapter(deviceListAdapter);
         listView.setOnItemClickListener((parent, view1, position, id) -> {
             BluetoothDevice device = deviceListAdapter.getDevice(position);
             db.createObd(new Device(device.getName(), device.getAddress(), username));
-            ((NavigationHost) getActivity()).navigateTo(new SelectWear(), false);
+            ((NavigationHost) requireActivity()).navigateTo(new SelectWear(), false);
         });
         return view;
     }
@@ -65,17 +61,17 @@ public class SelectOBD extends Fragment {
     public void onStart() {
         super.onStart();
         BluetoothAdapter myAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (myAdapter == null) return;
+        if (!myAdapter.isEnabled()) myAdapter.enable();
         try {
             db.getObd(username);
-            ((NavigationHost) getActivity()).navigateTo(new SelectWear(), false);
+            ((NavigationHost) requireActivity()).navigateTo(new SelectWear(), false);
         } catch (CursorIndexOutOfBoundsException e) {
             Log.e("dispositivo no guardado", "no guardado");
         }
-        if (myAdapter != null) {
-            for (BluetoothDevice device : myAdapter.getBondedDevices()) {
-                deviceListAdapter.addDevice(device);
-                deviceListAdapter.notifyDataSetChanged();
-            }
+        for (BluetoothDevice device : myAdapter.getBondedDevices()) {
+            deviceListAdapter.addDevice(device);
+            deviceListAdapter.notifyDataSetChanged();
         }
     }
 
@@ -87,8 +83,8 @@ public class SelectOBD extends Fragment {
     }
 
     private class DeviceListAdapter extends BaseAdapter {
-        private ArrayList<BluetoothDevice> mDevices;
-        private LayoutInflater mInflator;
+        private final ArrayList<BluetoothDevice> mDevices;
+        private final LayoutInflater mInflator;
 
         public DeviceListAdapter() {
             super();

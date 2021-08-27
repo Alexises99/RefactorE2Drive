@@ -1,5 +1,7 @@
 package com.example.refactore2drive.chart;
 
+import androidx.annotation.NonNull;
+
 /**
  * Representacion de la clase Entry pero con más datos para poder guardar datos en la BD y poder
  * recuperarlos por fecha
@@ -24,14 +26,6 @@ public class Value {
         this.x = x;
         this.y = y;
         this.nickname = nickname;
-        this.date = date;
-    }
-
-    public Value (long x, long y, String nickname,String date, long id) {
-        this.x = x;
-        this.y = y;
-        this.nickname = nickname;
-        this.id = id;
         this.date = date;
     }
 
@@ -75,6 +69,7 @@ public class Value {
         this.date = date;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Value{" +

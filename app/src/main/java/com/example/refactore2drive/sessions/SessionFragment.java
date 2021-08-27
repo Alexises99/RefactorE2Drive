@@ -1,14 +1,20 @@
 package com.example.refactore2drive.sessions;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.CursorIndexOutOfBoundsException;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -21,10 +27,13 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.refactore2drive.Helper;
+import com.example.refactore2drive.MainActivity;
 import com.example.refactore2drive.R;
 import com.example.refactore2drive.activities.MoreInfoActivity;
+import com.example.refactore2drive.activities.UserConfigActivity;
 import com.example.refactore2drive.database.DatabaseHelper;
 import com.example.refactore2drive.models.Discapacity;
 import com.example.refactore2drive.models.Disease;
@@ -33,24 +42,24 @@ import com.example.refactore2drive.models.SessionModel;
 import com.example.refactore2drive.obd.BluetoothServiceOBD;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class SessionFragment extends Fragment {
 
     private SessionListAdapter sessionListAdapter;
     private ListView listSessions;
     private MaterialButton startSession, endSession;
-    private SessionModel sessionModel;
-    private TextInputLayout commentInput;
+    //private SessionModel sessionModel;
     private TextInputEditText commentEdit;
     private String username;
     private DatabaseHelper db;
     public static final String ACTION_SESSION_START = "com.example_ACTION_SESSION_START";
     public static final String ACTION_SESSION_END = "com.example_ACTION_SESSION_END";
+    public static final int REQUEST_EXTERNAL_STORAGE = 2000;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -69,7 +78,6 @@ public class SessionFragment extends Fragment {
         startSession = view.findViewById(R.id.start_session);
         endSession = view.findViewById(R.id.end_session);
         commentEdit = view.findViewById(R.id.comment_edit);
-        commentInput = view.findViewById(R.id.comment_input);
         listeners();
         return view;
     }
@@ -79,12 +87,16 @@ public class SessionFragment extends Fragment {
         super.onResume();
         db = new DatabaseHelper(getActivity());
         username = Helper.getUsername(getActivity());
+        ArrayList<SessionModel> arrayList = new ArrayList<>(db.getSessions(username));
+        arrayList.forEach(sessionModel1 -> sessionListAdapter.addSession(sessionModel1));
+        sessionListAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         db.closeDB();
+        sessionListAdapter.clear();
     }
 
     @Override
@@ -95,38 +107,86 @@ public class SessionFragment extends Fragment {
 
     private void listeners() {
         startSession.setOnClickListener(view -> {
+            if (ContextCompat.checkSelfPermission(requireActivity(),
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    showMessageOKCancel("Escribir es necesario para guardar el csv en su dispositivo",
+                            ((dialogInterface, i) -> requestPermission()));
+                } else {
+                    requestPermission();
+                }
+            }
             startSession.setEnabled(false);
             endSession.setEnabled(true);
             Intent intent = new Intent(getActivity(), BluetoothServiceOBD.class);
             intent.putExtra("deviceAddress",db.getObd(username).getAddress());
             intent.putExtra("mode", true);
-            getActivity().startService(intent);
-            LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent(ACTION_SESSION_START));
+            requireActivity().startService(intent);
+            MainActivity.sessionStarted = true;
             String iniTime = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
-            sessionModel = new SessionModel();
-            sessionModel.setName("test"+iniTime+".csv");
-            sessionModel.settIni(iniTime);
-            sessionModel.setUsername(username);
+            MainActivity.sessionModel = new SessionModel();
+            MainActivity.sessionModel.setName("test"+iniTime+".csv");
+            MainActivity.sessionModel.settIni(iniTime);
+            MainActivity.sessionModel.setUsername(username);
             String init = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
             String[] comment = new String[1];
-            comment[0] = commentEdit.getText().toString();
+            comment[0] = Objects.requireNonNull(commentEdit.getText()).toString();
             Intent intent1 = new Intent(getActivity(), TransferDataService.class);
             intent1.putExtra("name", username+"-"+init+".csv");
             intent1.putExtra("comment", comment);
             intent1.putExtra("data", loadDataPerson());
-            getActivity().startService(intent1);
+            requireActivity().startService(intent1);
         });
         endSession.setOnClickListener(view -> {
             startSession.setEnabled(true);
             endSession.setEnabled(false);
-            LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(new Intent(ACTION_SESSION_END));
-            sessionModel.settFin(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-            sessionListAdapter.addSession(sessionModel);
+            MainActivity.sessionModel.settFin(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+            MainActivity.sessionStarted = false;
+            db.createSession(MainActivity.sessionModel);
+            sessionListAdapter.addSession(MainActivity.sessionModel);
             sessionListAdapter.notifyDataSetChanged();
-            getActivity().stopService(new Intent(getActivity(), TransferDataService.class));
-            getActivity().stopService(new Intent(getActivity(), BluetoothServiceOBD.class));
+            MainActivity.sessionModel = null;
+            requireActivity().stopService(new Intent(getActivity(), TransferDataService.class));
+            requireActivity().stopService(new Intent(getActivity(), BluetoothServiceOBD.class));
 
         });
+        listSessions.setOnItemClickListener((adapterView, view, i, l) -> {
+            SessionModel session = sessionListAdapter.getSession(i);
+            createAlertDialog(session, i);
+        });
+    }
+
+
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(requireActivity(), new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_EXTERNAL_STORAGE);
+    }
+
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(requireActivity())
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
+    }
+
+    private void createAlertDialog(SessionModel session, int i) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        builder.setMessage("¿Desea borrar la sesión?").setTitle("Borrar sesión");
+// Add the buttons
+        builder.setPositiveButton("Ok", (dialog, id) -> {
+            // User clicked OK button
+            db.deleteSession(session.getId());
+            sessionListAdapter.delete(i);
+            sessionListAdapter.notifyDataSetChanged();
+        });
+        builder.setNegativeButton("Cancel", (dialog, id) -> {
+            // User cancelled the dialog
+            Toast.makeText(getActivity(), "No has borrado nada", Toast.LENGTH_SHORT).show();
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private String[] loadDataPerson() {
@@ -164,6 +224,9 @@ public class SessionFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.more_info:
                 startActivity(new Intent(getActivity(), MoreInfoActivity.class));
+                return true;
+            case R.id.settings:
+                startActivity(new Intent(requireActivity(), UserConfigActivity.class));
                 return true;
             default:
                 return false;

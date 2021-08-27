@@ -18,6 +18,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class AddContactActivity extends AppCompatActivity implements NavigationHost {
 
@@ -36,7 +37,7 @@ public class AddContactActivity extends AppCompatActivity implements NavigationH
         but.setOnClickListener(view -> {
             boolean noErrors = true;
             for (TextInputLayout textInputLayout : textInputLayouts) {
-                String editTextString = textInputLayout.getEditText().getText().toString();
+                String editTextString = Objects.requireNonNull(textInputLayout.getEditText()).getText().toString();
                 if (editTextString.isEmpty()) {
                     textInputLayout.setError("No puede estar vacio");
                     noErrors = false;
@@ -44,7 +45,7 @@ public class AddContactActivity extends AppCompatActivity implements NavigationH
                     textInputLayout.setError(null);
                 }
             }
-            /**
+            /*
              * Se envia el contacto al fragmento para que el lo guarde y muestre por pantalla
              */
             if (noErrors) {
@@ -52,7 +53,7 @@ public class AddContactActivity extends AppCompatActivity implements NavigationH
                 TextInputEditText e2 = findViewById(R.id.edit_number);
                 Bundle bundle = new Bundle();
                 Intent intent = new Intent(ACTION_ADD_CONTACT);
-                Contact contact = new Contact(e1.getText().toString(), e2.getText().toString());
+                Contact contact = new Contact(Objects.requireNonNull(e1.getText()).toString(), Objects.requireNonNull(e2.getText()).toString());
                 bundle.putSerializable("contact", contact);
                 intent.putExtras(bundle);
                 LocalBroadcastManager.getInstance(AddContactActivity.this).sendBroadcast(intent);
@@ -77,7 +78,7 @@ public class AddContactActivity extends AppCompatActivity implements NavigationH
      * Implementación de Contact de manera serializable para poder ser enviado al fragmento
      */
 
-    public class Contact implements Serializable {
+    public static class Contact implements Serializable {
         private final String name, number;
         public Contact(String name, String number) {
             this.name = name;

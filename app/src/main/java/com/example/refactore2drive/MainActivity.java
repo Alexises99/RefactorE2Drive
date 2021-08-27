@@ -1,24 +1,27 @@
 package com.example.refactore2drive;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.View;
 
 import com.example.refactore2drive.call.CallFragment;
 import com.example.refactore2drive.chart.ChartFragment;
 import com.example.refactore2drive.controlpanel.InfoGridFragment;
 import com.example.refactore2drive.login.LoginFragment;
+import com.example.refactore2drive.models.SessionModel;
 import com.example.refactore2drive.sessions.SessionFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity implements NavigationHost{
     public static long prevSpeed = -1;
     public static long prevConsume = -1;
+    public static SessionModel sessionModel;
+    public static boolean sessionStarted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,17 @@ public class MainActivity extends AppCompatActivity implements NavigationHost{
                     .commit();
         }
     }
+
+    public boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     @Override
     public void navigateTo(Fragment fragment, boolean addToBackStack) {

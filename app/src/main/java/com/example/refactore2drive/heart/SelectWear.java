@@ -1,16 +1,22 @@
 package com.example.refactore2drive.heart;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.CursorIndexOutOfBoundsException;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
@@ -40,6 +46,7 @@ public class SelectWear extends Fragment {
     private  ListView listView;
     private DatabaseHelper db;
     private String username;
+    public static final int REQUEST_LOCATION = 1000;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,6 +59,28 @@ public class SelectWear extends Fragment {
         super.onAttach(context);
         db = new DatabaseHelper(getActivity());
         username = Helper.getUsername(getActivity());
+        if (ContextCompat.checkSelfPermission(requireActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
+                showMessageOKCancel("La ubicación es necesaria para escanear dispositivos bluetooth",
+                        ((dialogInterface, i) -> requestPermission()));
+            } else {
+                requestPermission();
+            }
+        }
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(requireActivity(), new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
+    }
+
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(requireActivity())
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
     }
 
     @Override

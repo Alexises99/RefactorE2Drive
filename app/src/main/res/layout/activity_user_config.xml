@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:layout_marginHorizontal="16dp"
     android:layout_marginVertical="16dp"
-    tools:context=".login.SignupActivity" >
+    tools:context=".activities.UserConfigActivity" >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,27 +20,7 @@
             android:text="Cuenta" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/username_input_reg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Widget.Shrine.TextInputLayout"
-            app:startIconDrawable="@drawable/ic_person_login"
-            android:hint="Nombre de usuario*"
-            app:errorEnabled="true"
-            app:helperTextEnabled="true"
-            android:padding="8dp"
-            app:helperText="Introduce tu nombre de usuario" >
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/username_edit_reg"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/password_input_reg"
+            android:id="@+id/password_input_config"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.Shrine.TextInputLayout"
@@ -53,7 +33,7 @@
             app:helperText="Introduce tu contraseña" >
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/password_edit_reg"
+                android:id="@+id/password_edit_config"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword" />
@@ -67,7 +47,7 @@
             android:text="Mis datos" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/name_input_reg"
+            android:id="@+id/name_input_config"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.Shrine.TextInputLayout"
@@ -76,7 +56,7 @@
             app:errorEnabled="true" >
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/name_edit_reg"
+                android:id="@+id/name_edit_config"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName" />
@@ -91,7 +71,7 @@
             android:padding="8dp" >
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/age_input_reg"
+                android:id="@+id/age_input_config"
                 android:layout_width="wrap_content"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
@@ -101,7 +81,7 @@
                 app:errorEnabled="true" >
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/age_edit_reg"
+                    android:id="@+id/age_edit_config"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="number" />
@@ -109,7 +89,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/height_input_reg"
+                android:id="@+id/height_input_config"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -119,15 +99,15 @@
                 app:errorEnabled="true" >
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/height_edit_reg"
+                    android:id="@+id/height_edit_config"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number" />
+                    android:inputType="numberDecimal" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/weight_input_reg"
+                android:id="@+id/weight_input_config"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -136,10 +116,10 @@
                 android:hint="Peso" >
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/weight_edit_reg"
+                    android:id="@+id/weight_edit_config"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"/>
+                    android:inputType="numberDecimal"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -151,28 +131,28 @@
             android:text="Indica tu genero" />
 
         <RadioGroup
-            android:id="@+id/radioGroup"
+            android:id="@+id/radioGroup_config"
             android:checkedButton="@+id/radio_button_1"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
 
             <com.google.android.material.radiobutton.MaterialRadioButton
-                android:id="@+id/radio_female"
+                android:id="@+id/radio_female_config"
                 android:layout_width="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_height="match_parent"
                 android:text="Mujer" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
-                android:id="@+id/radio_male"
+                android:id="@+id/radio_male_config"
                 android:layout_width="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_height="match_parent"
                 android:text="Hombre" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
-                android:id="@+id/radio_other"
+                android:id="@+id/radio_other_config"
                 android:layout_width="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_height="match_parent"
@@ -194,7 +174,7 @@
             android:padding="8dp" >
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/discapacity_input_reg"
+                android:id="@+id/discapacity_input_config"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -204,7 +184,7 @@
                 app:errorEnabled="true" >
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/discapacity_edit_reg"
+                    android:id="@+id/discapacity_edit_config"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:maxLines="1" />
@@ -212,7 +192,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/degree_input_reg"
+                android:id="@+id/degree_input_config"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
@@ -222,7 +202,7 @@
                 app:errorEnabled="true" >
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/degree_edit_reg"
+                    android:id="@+id/degree_edit_config"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="number" />
@@ -244,25 +224,25 @@
             android:baselineAligned="false" >
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/disease_input_reg"
+                android:id="@+id/disease_input_config"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/Widget.Shrine.TextInputLayout"
                 android:hint="Patologia"
-                android:layout_toLeftOf="@id/addDisease"
+                android:layout_toLeftOf="@id/addDisease_config"
                 android:layout_alignParentStart="true"
                 app:errorEnabled="true"
                 android:layout_marginEnd="8dp" >
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/disease_edit_reg"
+                    android:id="@+id/disease_edit_config"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/addDisease"
+                android:id="@+id/addDisease_config"
                 style="@style/Widget.Shrine.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -275,12 +255,12 @@
         </RelativeLayout>
 
         <ListView
-            android:id="@+id/list_diseases_reg"
+            android:id="@+id/list_diseases_config"
             android:layout_width="match_parent"
             android:layout_height="256dp"
             android:divider="@null"
-            android:dividerHeight="0dp"
-            android:nestedScrollingEnabled="true"/>
+            android:nestedScrollingEnabled="true"
+            android:dividerHeight="0dp" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -292,18 +272,18 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:text="Siguiente"
-                android:id="@+id/next_button_reg" />
+                android:text="Guardar"
+                android:id="@+id/next_button_config" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/cancel_button_reg"
+                android:id="@+id/cancel_button_config"
                 style="@style/Widget.Shrine.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
                 android:layout_marginRight="12dp"
-                android:layout_toStartOf="@id/next_button_reg"
-                android:layout_toLeftOf="@id/next_button_reg"
+                android:layout_toStartOf="@id/next_button_config"
+                android:layout_toLeftOf="@id/next_button_config"
                 android:text="Cancelar" />
 
         </RelativeLayout>

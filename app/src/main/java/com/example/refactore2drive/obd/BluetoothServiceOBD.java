@@ -85,6 +85,7 @@ public class BluetoothServiceOBD extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "Servicio OBD levantado");
+        isRunning = true;
         //Recuperamos la dirección del dispositivo del intent
         String deviceName = intent.getStringExtra("deviceAddress");
         /*
@@ -95,7 +96,6 @@ public class BluetoothServiceOBD extends Service {
          */
         mode = intent.getBooleanExtra("mode", false);
         //Actualización del estado del servicio
-        isRunning = true;
         checkBt(deviceName);
         return super.onStartCommand(intent, flags, startId);
 

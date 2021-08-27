@@ -1,5 +1,7 @@
 package com.example.refactore2drive.call;
 
+import androidx.annotation.NonNull;
+
 import com.example.refactore2drive.R;
 
 public class ContactEntry {
@@ -9,8 +11,8 @@ public class ContactEntry {
 
     /**
      * Representa el modelo de un contacto
-     * @param name
-     * @param number
+     * @param name nombre del contacto
+     * @param number numero del contacto
      */
     public ContactEntry(String name, String number) {
         this.name = name;
@@ -18,6 +20,7 @@ public class ContactEntry {
         this.resourceId = R.drawable.ic_person;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "ContactEntry{" +

@@ -26,7 +26,7 @@ public class InfoEntry {
     /**
      * Inicia la lista con unos valores iniciales y se añaden a la lista de valores para ser iniciada
      * posteriormente
-     * @return
+     * @return lista ya inicializada
      */
     public static List<InfoEntry> initList() {
         List<InfoEntry> list = new ArrayList<>();

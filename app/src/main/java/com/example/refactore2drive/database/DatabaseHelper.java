@@ -17,6 +17,7 @@ import com.example.refactore2drive.models.Disease;
 import com.example.refactore2drive.models.Person;
 import com.example.refactore2drive.models.SessionModel;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -249,7 +250,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_DATA_HEART);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_DATA_CONSUME);
     }
-    public long createPerson(Person person) {
+    public void createPerson(Person person) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_PERSON_NAME, person.getName());
@@ -258,69 +259,62 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(COLUMN_PERSON_NICKNAME, person.getNickname());
         cv.put(COLUMN_PERSON_WEIGHT, person.getWeight());
         cv.put(COLUMN_PERSON_HEIGHT, person.getHeight());
-        long id = db.insert(TABLE_PERSON,null,cv);
-        return id;
+        db.insert(TABLE_PERSON,null,cv);
     }
 
-    public long createInjury(Disease injury) {
+    public void createInjury(Disease injury) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_INJURY_NAME, injury.getName());
         cv.put(COLUMN_INJURY_NICKNAME, injury.getNickname());
-        long id = db.insert(TABLE_INJURY, null,cv);
-        return id;
+        db.insert(TABLE_INJURY, null,cv);
     }
 
-    public long createDiscapacity(Discapacity discapacity) {
+    public void createDiscapacity(Discapacity discapacity) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_DISCAPACITY_NICKNAME, discapacity.getNickname());
         cv.put(COLUMN_DISCAPACITY_DEGREE, discapacity.getDegree());
         cv.put(COLUMN_DISCAPACITY_TYPE, discapacity.getType());
-        long id = db.insert(TABLE_DISCAPACITY, null, cv);
-        return id;
+        db.insert(TABLE_DISCAPACITY, null, cv);
     }
 
-    public long createContact(Contact contact) {
+    public void createContact(Contact contact) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_CONTACT_NAME, contact.getName());
         cv.put(COLUMN_CONTACT_NICKNAME, contact.getNickname());
         cv.put(COLUMN_CONTACT_TELEPHONE, contact.getNumber());
-        long id = db.insert(TABLE_CONTACT, null, cv);
-        return id;
+        db.insert(TABLE_CONTACT, null, cv);
     }
 
-    public long createAccount(Account account) {
+    public void createAccount(Account account) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_ACCOUNT_NICKNAME, account.getName());
         cv.put(COLUMN_ACCOUNT_PASSWORD, account.getPassword());
-        long id = db.insert(TABLE_ACCOUNT, null, cv);
-        return id;
+        db.insert(TABLE_ACCOUNT, null, cv);
     }
 
-    public long createObd(Device device) {
+    public void createObd(Device device) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_OBD_ADDRESS, device.getAddress());
         cv.put(COLUMN_OBD_NAME, device.getName());
         cv.put(COLUMN_OBD_NICKNAME, device.getNickname());
-        long id = db.insert(TABLE_OBD, null, cv);
-        return id;
+        db.insert(TABLE_OBD, null, cv);
     }
 
-    public long createWear(Device device) {
+    public void createWear(Device device) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_WEAR_ADDRESS, device.getAddress());
         cv.put(COLUMN_WEAR_NAME, device.getName());
         cv.put(COLUMN_WEAR_NICKNAME, device.getNickname());
-        long id = db.insert(TABLE_WEAR, null, cv);
-        return id;
+        db.insert(TABLE_WEAR, null, cv);
     }
 
-    public long createSession(SessionModel sessionModel) {
+    public void createSession(SessionModel sessionModel) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_SESSION_NAME, sessionModel.getName());
@@ -328,27 +322,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(COLUMN_SESSION_TFIN, sessionModel.gettFin());
         cv.put(COLUMN_SESSION_TINI, sessionModel.gettIni());
         cv.put(COLUMN_SESSION_USERNAME, sessionModel.getUsername());
-        return db.insert(TABLE_SESSION, null, cv);
+        db.insert(TABLE_SESSION, null, cv);
     }
 
-    public long createDataConsume(Value value) {
+    public void createDataConsume(Value value) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_DATA_NICKNAME, value.getNickname());
         cv.put(COLUMN_DATA_VALUE, value.getY());
         cv.put(COLUMN_DATA_TIME, value.getX());
         cv.put(COLUMN_DATA_DATE, value.getDate());
-        return db.insert(TABLE_DATA_CONSUME, null, cv);
+        db.insert(TABLE_DATA_CONSUME, null, cv);
     }
 
-    public long createDataSpeed(Value value) {
+    public void createDataSpeed(Value value) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_DATA_NICKNAME, value.getNickname());
         cv.put(COLUMN_DATA_VALUE, value.getY());
         cv.put(COLUMN_DATA_TIME, value.getX());
         cv.put(COLUMN_DATA_DATE, value.getDate());
-        return db.insert(TABLE_DATA_SPEED, null, cv);
+        db.insert(TABLE_DATA_SPEED, null, cv);
     }
 
     public long createDataHeart(Value value) {
@@ -369,14 +363,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, null);
         if (cursor != null) cursor.moveToFirst();
         Person person = new Person();
-        person.setAge(cursor.getInt(cursor.getColumnIndex(COLUMN_PERSON_AGE)));
-        person.setGenre(cursor.getString(cursor.getColumnIndex(COLUMN_PERSON_GENRE)));
-        person.setHeight(cursor.getFloat(cursor.getColumnIndex(COLUMN_PERSON_WEIGHT)));
-        person.setName(cursor.getString(cursor.getColumnIndex(COLUMN_PERSON_NAME)));
-        person.setNickname(cursor.getString(cursor.getColumnIndex(COLUMN_PERSON_NICKNAME)));
-        person.setWeight(cursor.getFloat(cursor.getColumnIndex(COLUMN_PERSON_WEIGHT)));
-        person.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)));
-
+        if (cursor != null) {
+            person.setAge(cursor.getInt(cursor.getColumnIndex(COLUMN_PERSON_AGE)));
+            person.setGenre(cursor.getString(cursor.getColumnIndex(COLUMN_PERSON_GENRE)));
+            person.setHeight(cursor.getInt(cursor.getColumnIndex(COLUMN_PERSON_WEIGHT)));
+            person.setName(cursor.getString(cursor.getColumnIndex(COLUMN_PERSON_NAME)));
+            person.setNickname(cursor.getString(cursor.getColumnIndex(COLUMN_PERSON_NICKNAME)));
+            person.setWeight(cursor.getInt(cursor.getColumnIndex(COLUMN_PERSON_WEIGHT)));
+            person.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)));
+            cursor.close();
+        }
         return person;
     }
 
@@ -388,14 +384,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, null);
         if (cursor != null) cursor.moveToFirst();
         Person person = new Person();
-        person.setAge(cursor.getInt(cursor.getColumnIndex(COLUMN_PERSON_AGE)));
-        person.setGenre(cursor.getString(cursor.getColumnIndex(COLUMN_PERSON_GENRE)));
-        person.setHeight(cursor.getFloat(cursor.getColumnIndex(COLUMN_PERSON_WEIGHT)));
-        person.setName(cursor.getString(cursor.getColumnIndex(COLUMN_PERSON_NAME)));
-        person.setNickname(cursor.getString(cursor.getColumnIndex(COLUMN_PERSON_NICKNAME)));
-        person.setWeight(cursor.getFloat(cursor.getColumnIndex(COLUMN_PERSON_WEIGHT)));
-        person.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)));
-
+        if (cursor != null) {
+            person.setAge(cursor.getInt(cursor.getColumnIndex(COLUMN_PERSON_AGE)));
+            person.setGenre(cursor.getString(cursor.getColumnIndex(COLUMN_PERSON_GENRE)));
+            person.setHeight(cursor.getInt(cursor.getColumnIndex(COLUMN_PERSON_WEIGHT)));
+            person.setName(cursor.getString(cursor.getColumnIndex(COLUMN_PERSON_NAME)));
+            person.setNickname(cursor.getString(cursor.getColumnIndex(COLUMN_PERSON_NICKNAME)));
+            person.setWeight(cursor.getInt(cursor.getColumnIndex(COLUMN_PERSON_WEIGHT)));
+            person.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)));
+            cursor.close();
+        }
         return person;
     }
 
@@ -415,6 +413,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 injuries.add(injury);
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return injuries;
     }
 
@@ -435,6 +434,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 contacts.add(contact);
             } while(cursor.moveToNext());
         }
+        cursor.close();
         return contacts;
     }
 
@@ -455,6 +455,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 discapacities.add(discapacity);
             } while(cursor.moveToNext());
         }
+        cursor.close();
         return discapacities;
     }
 
@@ -470,6 +471,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 list.add(nick);
             } while(cursor.moveToNext());
         }
+        cursor.close();
         return list;
     }
 
@@ -481,9 +483,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, null);
         if (cursor != null) cursor.moveToFirst();
         Account account = new Account();
-        account.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)));
-        account.setName(cursor.getString(cursor.getColumnIndex(COLUMN_ACCOUNT_NICKNAME)));
-        account.setPassword(cursor.getString(cursor.getColumnIndex(COLUMN_ACCOUNT_PASSWORD)));
+        if (cursor != null) {
+            account.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)));
+            account.setName(cursor.getString(cursor.getColumnIndex(COLUMN_ACCOUNT_NICKNAME)));
+            account.setPassword(cursor.getString(cursor.getColumnIndex(COLUMN_ACCOUNT_PASSWORD)));
+            cursor.close();
+        }
         return account;
     }
 
@@ -495,10 +500,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, null);
         if (cursor != null) cursor.moveToFirst();
         Device device = new Device();
-        device.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)));
-        device.setAddress(cursor.getString(cursor.getColumnIndex(COLUMN_OBD_ADDRESS)));
-        device.setName(cursor.getString(cursor.getColumnIndex(COLUMN_OBD_NAME)));
-        device.setNickname(cursor.getString(cursor.getColumnIndex(COLUMN_OBD_NICKNAME)));
+        if (cursor != null) {
+            device.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)));
+            device.setAddress(cursor.getString(cursor.getColumnIndex(COLUMN_OBD_ADDRESS)));
+            device.setName(cursor.getString(cursor.getColumnIndex(COLUMN_OBD_NAME)));
+            device.setNickname(cursor.getString(cursor.getColumnIndex(COLUMN_OBD_NICKNAME)));
+            cursor.close();
+        }
         return device;
     }
 
@@ -510,10 +518,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, null);
         if (cursor != null) cursor.moveToFirst();
         Device device = new Device();
-        device.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)));
-        device.setAddress(cursor.getString(cursor.getColumnIndex(COLUMN_WEAR_ADDRESS)));
-        device.setName(cursor.getString(cursor.getColumnIndex(COLUMN_WEAR_NAME)));
-        device.setNickname(cursor.getString(cursor.getColumnIndex(COLUMN_WEAR_NICKNAME)));
+        if (cursor != null) {
+            device.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)));
+            device.setAddress(cursor.getString(cursor.getColumnIndex(COLUMN_WEAR_ADDRESS)));
+            device.setName(cursor.getString(cursor.getColumnIndex(COLUMN_WEAR_NAME)));
+            device.setNickname(cursor.getString(cursor.getColumnIndex(COLUMN_WEAR_NICKNAME)));
+            cursor.close();
+        }
         return device;
     }
 
@@ -535,6 +546,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 list.add(sessionModel);
             } while(cursor.moveToNext());
         }
+        cursor.close();
         return list;
     }
 
@@ -556,6 +568,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 list.add(value);
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return list;
     }
 
@@ -577,6 +590,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 list.add(value);
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return list;
     }
 
@@ -598,6 +612,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 list.add(value);
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return list;
     }
 
@@ -619,6 +634,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 list.add(value);
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return list;
     }
 
@@ -640,6 +656,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 list.add(value);
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return list;
     }
 
@@ -661,6 +678,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 list.add(value);
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return list;
     }
 
@@ -748,10 +766,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 new String[] {String.valueOf(id)});
     }
 
-    public void deleteInjury(long id) {
+    public void deleteInjury(String username) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_INJURY, COLUMN_ID + " = ?",
-                new String[] {String.valueOf(id)});
+        db.delete(TABLE_INJURY, COLUMN_INJURY_NICKNAME + " = ?", new String[]{username});
     }
 
     public void deleteDiscapacity(long id) {
