@@ -2,19 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/linear_dev"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.DeveloperModeActivity"
-    android:orientation="vertical"
-    android:background="@color/background_material_light">
+    tools:context=".eyes.CamaraActivity"
+    android:orientation="vertical">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/dev_app_bar"
+            android:id="@+id/camera_app_bar"
             style="@style/Widget.Shrine.Toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -22,17 +20,17 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <TextView
+    <com.example.refactore2drive.eyes.CameraSourcePreview
+        android:id="@+id/preview1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Lista de todos los comandos soportados"
-        android:gravity="center_horizontal" />
+        android:layout_height="match_parent" >
 
-    <TableLayout
-        android:id="@+id/table_commands_dev"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:divider="@null"
-        android:dividerHeight="0dp" />
+        <com.example.refactore2drive.eyes.GraphicOverlay
+            android:id="@+id/faceOverlay1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
 
+        </com.example.refactore2drive.eyes.GraphicOverlay>
+
+    </com.example.refactore2drive.eyes.CameraSourcePreview>
 </LinearLayout>

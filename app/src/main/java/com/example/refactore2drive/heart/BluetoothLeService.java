@@ -19,6 +19,7 @@ import android.util.Log;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,10 +55,14 @@ public class BluetoothLeService extends Service {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 intentAction = ACTION_GATT_CONNECTED;
                 mConnectionState = STATE_CONNECTED;
+                Log.d("GATT conectado", "gatt conectado");
+                Log.i(TAG, "Attempting to start service discovery:" +
+                        mBluetoothGatt.discoverServices());
                 broadcastUpdate(intentAction);
                 // Attempts to discover services after successful connection.
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED;
+                Log.d("GATT desconectado", "gatt desconectado");
                 mConnectionState = STATE_DISCONNECTED;
                 broadcastUpdate(intentAction);
             }
@@ -65,7 +70,10 @@ public class BluetoothLeService extends Service {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
+                Log.d("Servicio descubierto", "servicio descubierto");
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
+            } else {
+                Log.d(TAG, "onServicesDiscoveres recived: " + status);
             }
         }
         @Override
@@ -73,6 +81,7 @@ public class BluetoothLeService extends Service {
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
+                Log.d("Datos disponibles", "datos disponibles");
                 broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
             }
         }
@@ -105,6 +114,7 @@ public class BluetoothLeService extends Service {
             }
             final int heartRate = characteristic.getIntValue(format, 1);
             data1 = String.valueOf(heartRate);
+            Log.d("El valor del pulso es:" , data1);
             intent.putExtra(EXTRA_DATA, String.valueOf(heartRate));
             try {
                 Thread.sleep(5000);
@@ -118,6 +128,7 @@ public class BluetoothLeService extends Service {
                 final StringBuilder stringBuilder = new StringBuilder(data.length);
                 for(byte byteChar : data)
                     stringBuilder.append(String.format("%02X ", byteChar));
+                Log.d("El valor del pulso es", Arrays.toString(data));
                 intent.putExtra(EXTRA_DATA, new String(data) + "\n" + stringBuilder.toString());
                 data1 = new String(data) + "\n" + stringBuilder.toString();
             }
@@ -178,7 +189,7 @@ public class BluetoothLeService extends Service {
             return false;
         }
         // Previously connected device.  Try to reconnect.
-        if (address.equals(mBluetoothDeviceAddress)
+        if (address != null && address.equals(mBluetoothDeviceAddress)
                 && mBluetoothGatt != null) {
             Log.d(TAG, "Trying to use an existing mBluetoothGatt for connection.");
             if (mBluetoothGatt.connect()) {

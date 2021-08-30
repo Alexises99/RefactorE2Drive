@@ -16,12 +16,6 @@ public class Discapacity {
         this.degree = degree;
     }
 
-    public Discapacity( String type, String nickname, int degree, long id) {
-        this.type = type;
-        this.nickname = nickname;
-        this.degree = degree;
-        this.id = id;
-    }
 
     public void setNickname(String nickname) {
         this.nickname = nickname;

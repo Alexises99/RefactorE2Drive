@@ -20,7 +20,7 @@
                 style="@style/Widget.Shrine.Toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:title="E2Drivee" />
+                app:title="E2Drive" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -28,6 +28,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
             android:gravity="center_horizontal" >
 
             <TextView
@@ -48,6 +50,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
             android:gravity="center_horizontal" >
 
             <TextView
@@ -60,25 +64,14 @@
                 android:id="@+id/status_heart"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Desconocido" />
+                android:text="Desconocidoo0" />
 
         </LinearLayout>
-
-        <androidx.core.widget.NestedScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="8dp"
-            android:paddingTop="16dp"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" >
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
-
-        </androidx.core.widget.NestedScrollView>
 
     </LinearLayout>
 

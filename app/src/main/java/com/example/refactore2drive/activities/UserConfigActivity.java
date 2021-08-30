@@ -1,16 +1,20 @@
 package com.example.refactore2drive.activities;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
+import android.content.Intent;
 import android.database.CursorIndexOutOfBoundsException;
-import android.location.SettingInjectorService;
 import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.refactore2drive.Helper;
@@ -24,15 +28,16 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.radiobutton.MaterialRadioButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.r0adkll.slidr.Slidr;
 
 import java.util.ArrayList;
 
 public class UserConfigActivity extends AppCompatActivity {
 
-    private TextInputLayout passwordInput, nameInput, ageInput, heightInput,
-    weightInput, typeInput, degreeInput, diseaseInput;
+    private TextInputLayout passwordInput, nameInput, ageInput, heightInput, typeInput, degreeInput, diseaseInput;
     private TextInputEditText passwordEdit, nameEdit, ageEdit, heightEdit,
     weightEdit, typeEdit, degreeEdit, diseaseEdit;
+    private TextView selectObd, selectWear;
     private RadioGroup radioGroup;
     private ArrayAdapter<String> arrayAdapter;
     private ListView listDiseases;
@@ -52,7 +57,6 @@ public class UserConfigActivity extends AppCompatActivity {
         listDiseases.setAdapter(arrayAdapter);
         load();
         listeners();
-
     }
 
     private void initialize() {
@@ -64,9 +68,8 @@ public class UserConfigActivity extends AppCompatActivity {
         ageEdit = findViewById(R.id.age_edit_config);
         heightInput = findViewById(R.id.height_input_config);
         heightEdit = findViewById(R.id.height_edit_config);
-        weightInput = findViewById(R.id.weight_input_config);
         weightEdit = findViewById(R.id.weight_edit_config);
-        typeInput = findViewById(R.id.disease_input_config);
+        typeInput = findViewById(R.id.discapacity_input_config);
         typeEdit = findViewById(R.id.discapacity_edit_config);
         degreeInput = findViewById(R.id.degree_input_config);
         degreeEdit = findViewById(R.id.degree_edit_config);
@@ -80,6 +83,23 @@ public class UserConfigActivity extends AppCompatActivity {
         male = findViewById(R.id.radio_male_config);
         female = findViewById(R.id.radio_female_config);
         other = findViewById(R.id.radio_other_config);
+        Toolbar toolbar = findViewById(R.id.config_app_bar);
+        selectObd = findViewById(R.id.select_obd);
+        selectWear = findViewById(R.id.select_wear);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+        Slidr.attach(this);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish(); // close this activity and return to preview activity (if there is any)
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void load() {
@@ -110,10 +130,22 @@ public class UserConfigActivity extends AppCompatActivity {
     }
 
     private void listeners() {
+        selectObd.setOnClickListener(
+                view -> startActivity(new Intent(this,
+                        ChangeObdActivity.class)
+                            .putExtra("mode", "obd")));
+
+        selectWear.setOnClickListener(
+                view -> startActivity(new Intent(this,
+                        ChangeObdActivity.class)
+                            .putExtra("mode", "wear")));
         cancelButton.setOnClickListener(view -> finish());
+
         addDisease.setOnClickListener(view -> {
-            if (!isTextValid(diseaseEdit.getText())) diseaseInput.setError("Campo no puede estar vacio");
-            else if (arrayAdapter.getPosition(diseaseEdit.getText().toString()) != -1) diseaseInput.setError("No puedes introducir campos repetidos");
+            if (!isTextValid(diseaseEdit.getText()))
+                diseaseInput.setError("Campo no puede estar vacio");
+            else if (arrayAdapter.getPosition(diseaseEdit.getText().toString()) != -1)
+                diseaseInput.setError("No puedes introducir campos repetidos");
             else {
                 diseaseInput.setError(null);
                 arrayAdapter.add(diseaseEdit.getText().toString());
@@ -123,16 +155,19 @@ public class UserConfigActivity extends AppCompatActivity {
 
         //Manejo de errores
         diseaseEdit.setOnKeyListener((view, i, keyEvent) -> {
-            if (isTextValid(diseaseEdit.getText())) diseaseInput.setError(null);
-            if (arrayAdapter.getPosition(diseaseEdit.getText().toString()) == -1) diseaseInput.setError(null);
+            if (isTextValid(diseaseEdit.getText()))
+                diseaseInput.setError(null);
+            if (arrayAdapter.getPosition(diseaseEdit.getText().toString()) == -1)
+                diseaseInput.setError(null);
             return false;
         });
-
 
         passwordEdit.setOnKeyListener((view, i, keyEvent) -> {
-            if (isTextValid(passwordEdit.getText()) && passwordEdit.getText().length() >= 8) passwordInput.setError(null);
+            if (isTextValid(passwordEdit.getText()) && passwordEdit.getText().length() >= 8)
+                passwordInput.setError(null);
             return false;
         });
+
         nameEdit.setOnKeyListener((view, i, keyEvent) -> {
             if (isTextValid(nameEdit.getText())) nameInput.setError(null);
             return false;
@@ -188,19 +223,16 @@ public class UserConfigActivity extends AppCompatActivity {
             }
             if (correct) {
                 String genre = null;
-                switch (radioGroup.getCheckedRadioButtonId()) {
-                    case R.id.radio_male_config:
-                        genre = "Hombre";
-                        break;
-                    case R.id.radio_female_config:
-                        genre = "Mujer";
-                        break;
-                    case R.id.radio_other_config:
-                        genre = "Otro";
-                        break;
-                    default:
-                        Toast.makeText(getApplicationContext(), "Seleccione un genero", Toast.LENGTH_SHORT).show();
-                        correct = false;
+                int checkedRadioButtonId = radioGroup.getCheckedRadioButtonId();
+                if (checkedRadioButtonId == R.id.radio_male_config) {
+                    genre = "Hombre";
+                } else if (checkedRadioButtonId == R.id.radio_female_config) {
+                    genre = "Mujer";
+                } else if (checkedRadioButtonId == R.id.radio_other_config) {
+                    genre = "Otro";
+                } else {
+                    Toast.makeText(getApplicationContext(), "Seleccione un genero", Toast.LENGTH_SHORT).show();
+                    correct = false;
                 }
                 if (correct) {
                     try {

@@ -15,7 +15,7 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/filter"
+        android:id="@+id/camera"
         android:icon="@drawable/ic_camera"
         android:title="Camara"
         app:showAsAction="always" />

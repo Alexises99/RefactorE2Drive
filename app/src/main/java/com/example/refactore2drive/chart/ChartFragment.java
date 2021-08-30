@@ -267,18 +267,17 @@ public class ChartFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.more_info:
-                startActivity(new Intent(getActivity(), MoreInfoActivity.class));
-                return true;
-            case R.id.settings:
-                startActivity(new Intent(requireActivity(), UserConfigActivity.class));
-                return true;
-            case R.id.developer_mode:
-                startActivity(new Intent(requireActivity(), DeveloperModeActivity.class));
-                return true;
-            default:
-                return false;
+        int itemId = item.getItemId();
+        if (itemId == R.id.more_info) {
+            startActivity(new Intent(getActivity(), MoreInfoActivity.class));
+            return true;
+        } else if (itemId == R.id.settings) {
+            startActivity(new Intent(requireActivity(), UserConfigActivity.class));
+            return true;
+        } else if (itemId == R.id.developer_mode) {
+            startActivity(new Intent(requireActivity(), DeveloperModeActivity.class));
+            return true;
         }
+        return false;
     }
 }

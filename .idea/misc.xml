@@ -5,6 +5,8 @@
       <map>
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/drawable-anydpi/ic_silence.xml" value="0.15" />
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/activity_add_contact.xml" value="0.25885416666666666" />
+        <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/activity_camara.xml" value="0.1723684210526316" />
+        <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/activity_change_obd.xml" value="0.1723684210526316" />
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/activity_developer_mode.xml" value="0.27291666666666664" />
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/activity_main.xml" value="0.13958333333333334" />
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/layout/activity_more_info.xml" value="0.27291666666666664" />
@@ -31,6 +33,11 @@
         <entry key="..\:/Users/BEC/AndroidStudioProjects/RefactorE2Drive/app/src/main/res/menu/menu_toolbar.xml" value="0.1" />
       </map>
     </option>
+  </component>
+  <component name="EntryPointsManager">
+    <list size="1">
+      <item index="0" class="java.lang.String" itemvalue="org.greenrobot.eventbus.Subscribe" />
+    </list>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />

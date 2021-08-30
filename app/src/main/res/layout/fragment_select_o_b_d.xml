@@ -32,6 +32,8 @@
         <ListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/obd_list" />
+            android:id="@+id/obd_list"
+            android:divider="@null"
+            android:dividerHeight="0dp"/>
 
     </LinearLayout>

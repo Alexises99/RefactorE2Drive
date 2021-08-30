@@ -17,7 +17,6 @@ import com.example.refactore2drive.models.Disease;
 import com.example.refactore2drive.models.Person;
 import com.example.refactore2drive.models.SessionModel;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 

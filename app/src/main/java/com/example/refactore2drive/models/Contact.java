@@ -1,5 +1,7 @@
 package com.example.refactore2drive.models;
 
+import androidx.annotation.NonNull;
+
 public class Contact {
     String name;
     int number;
@@ -55,6 +57,7 @@ public class Contact {
         this.id = id;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Contact{" +

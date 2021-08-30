@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.CursorIndexOutOfBoundsException;
 import android.os.Bundle;
@@ -20,7 +19,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,7 +41,6 @@ public class SelectWear extends Fragment {
     private boolean mScanning;
     private BluetoothAdapter myAdapter;
     private DeviceListAdapter deviceListAdapter;
-    private  ListView listView;
     private DatabaseHelper db;
     private String username;
     public static final int REQUEST_LOCATION = 1000;
@@ -87,8 +84,21 @@ public class SelectWear extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_select_wear, container, false);
-        listView = view.findViewById(R.id.wear_list);
+        ListView listView = view.findViewById(R.id.wear_list);
         switchCompat = view.findViewById(R.id.wear_switch);
+        switchCompat.setOnCheckedChangeListener((compoundButton, b) -> {
+            deviceListAdapter.clear();
+            deviceListAdapter.notifyDataSetChanged();
+            if (switchCompat.isChecked()) {
+                scanLeDevice(true);
+            } else {
+                scanLeDevice(false);
+                for (BluetoothDevice device : myAdapter.getBondedDevices()) {
+                    deviceListAdapter.addDevice(device);
+                    deviceListAdapter.notifyDataSetChanged();
+                }
+            }
+        });
         deviceListAdapter = new DeviceListAdapter();
         listView.setAdapter(deviceListAdapter);
         listView.setOnItemClickListener((adapterView, view1, i, l) -> {
@@ -98,9 +108,9 @@ public class SelectWear extends Fragment {
                 myAdapter.stopLeScan(mLeScanCallback);
                 mScanning = false;
             }
-            ((NavigationHost) getActivity()).navigateTo(InfoGridFragment.newInstance(device.getAddress()), false);
-
-            getActivity().findViewById(R.id.bottom_navigation).setVisibility(View.VISIBLE);
+            ((NavigationHost) requireActivity()).
+                    navigateTo(InfoGridFragment.newInstance(device.getAddress()), false);
+           requireActivity().findViewById(R.id.bottom_navigation).setVisibility(View.VISIBLE);
         });
         return view;
     }
@@ -111,8 +121,8 @@ public class SelectWear extends Fragment {
         scanLeDevice(true);
         try {
             Device device = db.getWear(username);
-            ((NavigationHost) getActivity()).navigateTo(InfoGridFragment.newInstance(device.getAddress()), false);
-            getActivity().findViewById(R.id.bottom_navigation).setVisibility(View.VISIBLE);
+            ((NavigationHost) requireActivity()).navigateTo(InfoGridFragment.newInstance(device.getAddress()), false);
+            requireActivity().findViewById(R.id.bottom_navigation).setVisibility(View.VISIBLE);
         } catch (CursorIndexOutOfBoundsException e) {
             Log.e("Error al recuperar wear", "error");
         }
@@ -143,7 +153,7 @@ public class SelectWear extends Fragment {
         }
     }
 
-    private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
+    private final BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
             deviceListAdapter.addDevice(device);
@@ -152,8 +162,8 @@ public class SelectWear extends Fragment {
     };
 
     private class DeviceListAdapter extends BaseAdapter {
-        private ArrayList<BluetoothDevice> mDevices;
-        private LayoutInflater mInflator;
+        private final ArrayList<BluetoothDevice> mDevices;
+        private final LayoutInflater mInflator;
 
         public DeviceListAdapter() {
             super();

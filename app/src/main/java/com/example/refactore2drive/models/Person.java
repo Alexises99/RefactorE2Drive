@@ -23,15 +23,6 @@ public class Person {
         this.height = height;
     }
 
-    public Person(String name, String nickname,int age, String genre, int height, long id) {
-        this.name = name;
-        this.nickname = nickname;
-        this.age = age;
-        this.genre = genre;
-        this.height = height;
-        this.id = id;
-    }
-
     public Person(String name, String nickname,int age, String genre, int height, int weight) {
         this.name = name;
         this.nickname = nickname;

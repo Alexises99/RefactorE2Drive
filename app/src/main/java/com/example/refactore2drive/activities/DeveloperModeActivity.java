@@ -1,16 +1,16 @@
 package com.example.refactore2drive.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -19,15 +19,12 @@ import com.example.refactore2drive.Helper;
 import com.example.refactore2drive.MessageEvent;
 import com.example.refactore2drive.R;
 import com.example.refactore2drive.database.DatabaseHelper;
-import com.example.refactore2drive.models.Device;
 import com.example.refactore2drive.obd.BluetoothServiceOBD;
-import com.example.refactore2drive.obd.OBDCommandJob;
+import com.r0adkll.slidr.Slidr;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.util.List;
 
 public class DeveloperModeActivity extends AppCompatActivity {
     private TableLayout tableLayout;
@@ -47,6 +44,22 @@ public class DeveloperModeActivity extends AppCompatActivity {
         intent.putExtra("deviceAddress", address);
         intent.putExtra("dev", true);
         startService(intent);
+        Toolbar toolbar = findViewById(R.id.dev_app_bar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+        Slidr.attach(this);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish(); // close this activity and return to preview activity (if there is any)
+        }
+        return super.onOptionsItemSelected(item);
+
     }
 
     @Override

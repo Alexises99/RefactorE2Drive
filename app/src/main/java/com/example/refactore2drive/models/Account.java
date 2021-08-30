@@ -14,11 +14,6 @@ public class Account {
         this.password = password;
     }
 
-    public Account(String name, String password, long id) {
-        this.name = name;
-        this.password = password;
-        this.id = id;
-    }
 
     public void setName(String name) {
         this.name = name;

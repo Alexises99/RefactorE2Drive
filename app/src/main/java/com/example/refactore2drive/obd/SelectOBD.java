@@ -3,7 +3,10 @@ package com.example.refactore2drive.obd;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.CursorIndexOutOfBoundsException;
 import android.os.Bundle;
 
@@ -22,6 +25,7 @@ import android.widget.TextView;
 import com.example.refactore2drive.Helper;
 import com.example.refactore2drive.NavigationHost;
 import com.example.refactore2drive.R;
+import com.example.refactore2drive.ToastUtils;
 import com.example.refactore2drive.database.DatabaseHelper;
 import com.example.refactore2drive.heart.SelectWear;
 import com.example.refactore2drive.models.Device;
@@ -33,6 +37,7 @@ public class SelectOBD extends Fragment {
     private DeviceListAdapter deviceListAdapter;
     private String username;
     private DatabaseHelper db;
+    private BluetoothAdapter myAdapter;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -45,23 +50,51 @@ public class SelectOBD extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_select_o_b_d, container, false);
+        myAdapter = BluetoothAdapter.getDefaultAdapter();
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        requireActivity().registerReceiver(mBroadcastReceiver, filter);
+        if (myAdapter == null) ToastUtils.show(requireActivity(), "Bluetooth no soportado");
         switchCompat = view.findViewById(R.id.obd_switch);
+        switchCompat.setOnCheckedChangeListener((compoundButton, b) -> {
+            deviceListAdapter.clear();
+            deviceListAdapter.notifyDataSetChanged();
+            if (switchCompat.isChecked()) {
+                myAdapter.startDiscovery();
+            } else {
+                myAdapter.cancelDiscovery();
+                for (BluetoothDevice device : myAdapter.getBondedDevices()) {
+                    deviceListAdapter.addDevice(device);
+                    deviceListAdapter.notifyDataSetChanged();
+                }
+            }
+        });
         ListView listView = view.findViewById(R.id.obd_list);
         deviceListAdapter = new DeviceListAdapter();
         listView.setAdapter(deviceListAdapter);
         listView.setOnItemClickListener((parent, view1, position, id) -> {
             BluetoothDevice device = deviceListAdapter.getDevice(position);
             db.createObd(new Device(device.getName(), device.getAddress(), username));
+            myAdapter.cancelDiscovery();
             ((NavigationHost) requireActivity()).navigateTo(new SelectWear(), false);
         });
         return view;
     }
 
+    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                deviceListAdapter.addDevice(device);
+                deviceListAdapter.notifyDataSetChanged();
+            }
+        }
+    };
+
     @Override
     public void onStart() {
         super.onStart();
-        BluetoothAdapter myAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (myAdapter == null) return;
         if (!myAdapter.isEnabled()) myAdapter.enable();
         try {
             db.getObd(username);

@@ -1,5 +1,7 @@
 package com.example.refactore2drive.models;
 
+import androidx.annotation.NonNull;
+
 public class SessionModel {
     String name;
     String tIni;
@@ -68,6 +70,7 @@ public class SessionModel {
         this.username = username;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "SessionModel{" +

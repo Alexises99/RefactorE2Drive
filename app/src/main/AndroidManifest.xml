@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permissions.READ_PHONE_NUMBERS" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -21,15 +22,24 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Shrine">
         <activity
-            android:name=".activities.UserConfigActivity"
+            android:name=".eyes.CamaraActivity"
             android:exported="true" />
+        <activity
+            android:name=".activities.ChangeObdActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Shirne.Slidr" />
+        <activity
+            android:name=".activities.UserConfigActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Shirne.Slidr" />
         <activity
             android:name=".activities.MoreInfoActivity"
             android:exported="true"
             android:theme="@style/Theme.Shirne.Slidr" />
         <activity
             android:name=".activities.DeveloperModeActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:theme="@style/Theme.Shirne.Slidr" />
         <activity
             android:name=".login.SignupActivity"
             android:exported="true" />

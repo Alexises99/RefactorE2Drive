@@ -2,15 +2,12 @@ package com.example.refactore2drive.obd;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.Message;
 import android.util.Log;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.refactore2drive.Helper;
 import com.example.refactore2drive.MessageEvent;
 import com.example.refactore2drive.MessageEventGrid;
-import com.example.refactore2drive.activities.DeveloperModeActivity;
 import com.example.refactore2drive.sessions.Headers;
 import com.github.pires.obd.enums.AvailableCommandNames;
 import com.github.pires.obd.exceptions.UnsupportedCommandException;
@@ -18,7 +15,6 @@ import com.github.pires.obd.exceptions.UnsupportedCommandException;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,9 +22,9 @@ import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 
 public class OBDConsumer implements Runnable{
-    private BlockingQueue<OBDCommandJob> queue;
+    private final BlockingQueue<OBDCommandJob> queue;
     private boolean isConnected;
-    private Context context;
+    private final Context context;
     public final static String ACTION_SEND_DATA_OBD_SESSION = "com.example_ACTION_SEND_DATA_OBD_SESSION";
     public final static String ACTION_SEND_DATA_TEMP="ACTION_OBD_DATA_TEMP";
     public final static String ACTION_SEND_DATA_SPEED="ACTION_OBD_DATA_SPEED";
@@ -37,10 +33,10 @@ public class OBDConsumer implements Runnable{
     public final static String ACTION_DISCONNECTED="com.example_ACTION_DISCONNECTED";
     private final static String TAG = OBDConsumer.class.getName();
     private HashMap<String, String> commandResults;
-    private HashMap<String, String> filter;
+    private final HashMap<String, String> filter;
     public ArrayList<String> collectedData;
-    private boolean mode;
-    private boolean modeDev;
+    private final boolean mode;
+    private final boolean modeDev;
 
     /**
      * Consumidor de comandos de la cola
@@ -141,7 +137,7 @@ public class OBDConsumer implements Runnable{
 
     /**
      * Comprobamos que sea correcto el job y lo procesamos
-     * @param job
+     * @param job obdcommandjob a procesar
      */
     public void stateUpdate(final OBDCommandJob job) {
         if (job == null) return;
@@ -181,6 +177,7 @@ public class OBDConsumer implements Runnable{
                     notifyFragment(cmdResult, ACTION_SEND_DATA_CONSUME, "dataConsume");
                     break;
             }
+
             //Actualizamos el HashMap con todos los valores
         /*
         TODO optimizar commandResults
@@ -195,12 +192,7 @@ public class OBDConsumer implements Runnable{
             commandResults.put(cmdName, cmdResult);
             if (commandResults.size() >= Headers.headers.length && mode) {
                 //Lanzamos un hilo que se encarga de procesar los datos y enviarlos al servicio de la sesión
-                (new Thread() {
-                    @Override
-                    public void run() {
-                        processCollectedData();
-                    }
-                }).start();
+                (new Thread(this::processCollectedData)).start();
             }
         }
     }
@@ -231,30 +223,16 @@ public class OBDConsumer implements Runnable{
             }
         }
         //Añadimos los elementos a la lista
-        Arrays.stream(results).forEach(value -> collectedData.add(value));
+        collectedData.addAll(Arrays.asList(results));
         if(collectedData.size() > 10) {
             //Cada vez que estemos aqui enviaremos los datos recolectados al servicio
             Log.d("Colectado", " " + collectedData.size());
             Intent intent = new Intent(ACTION_SEND_DATA_OBD_SESSION);
             //Hay que hacer una copia de collectedData porque si no, no se envia xDDD no tiene sentido
-            ArrayList<String> list = new ArrayList<>();
-            for (String data : collectedData) {
-                list.add(data);
-            }
+            ArrayList<String> list = new ArrayList<>(collectedData);
             intent.putExtra("lista", list);
             LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
             collectedData.clear();
-        }
-    }
-
-    public class Data implements Serializable{
-        String data;
-        public Data(String data) {
-            this.data = data;
-        }
-
-        public String getData() {
-            return data;
         }
     }
 }

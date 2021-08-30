@@ -37,6 +37,7 @@ import com.example.refactore2drive.R;
 import com.example.refactore2drive.activities.DeveloperModeActivity;
 import com.example.refactore2drive.activities.MoreInfoActivity;
 import com.example.refactore2drive.activities.UserConfigActivity;
+
 import com.example.refactore2drive.controlpanel.InfoGridItemDecoration;
 import com.example.refactore2drive.database.DatabaseHelper;
 import com.example.refactore2drive.models.Contact;
@@ -71,12 +72,10 @@ public class CallFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false));
         username = Helper.getUsername(getActivity());
-
         try {
             /*Se recuperan todos los contactos y se comprueba si se tiene el permiso para realizar
              la llamada, si se poseen se genera la actividad que contiene a la llamada.
              */
-
             ArrayList<Contact> contacts = new ArrayList<>(db.getContacts(username));
             Log.d("Contactos", contacts.toString());
             adapter = new ContactCardRecyclerViewAdapter(process(contacts), entry -> {
@@ -183,18 +182,17 @@ public class CallFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.more_info:
-                startActivity(new Intent(getActivity(), MoreInfoActivity.class));
-                return true;
-            case R.id.settings:
-                startActivity(new Intent(requireActivity(), UserConfigActivity.class));
-                return true;
-            case R.id.developer_mode:
-                startActivity(new Intent(requireActivity(), DeveloperModeActivity.class));
-                return true;
-            default:
-                return false;
+        int itemId = item.getItemId();
+        if (itemId == R.id.more_info) {
+            startActivity(new Intent(getActivity(), MoreInfoActivity.class));
+            return true;
+        } else if (itemId == R.id.settings) {
+            startActivity(new Intent(requireActivity(), UserConfigActivity.class));
+            return true;
+        } else if (itemId == R.id.developer_mode) {
+            startActivity(new Intent(requireActivity(), DeveloperModeActivity.class));
+            return true;
         }
+        return false;
     }
 }

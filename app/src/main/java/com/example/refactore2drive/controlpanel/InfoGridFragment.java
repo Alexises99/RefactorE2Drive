@@ -1,6 +1,5 @@
 package com.example.refactore2drive.controlpanel;
 
-import android.app.ActivityManager;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.BroadcastReceiver;
@@ -12,7 +11,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -40,10 +38,10 @@ import com.example.refactore2drive.activities.MoreInfoActivity;
 import com.example.refactore2drive.activities.UserConfigActivity;
 import com.example.refactore2drive.chart.Value;
 import com.example.refactore2drive.database.DatabaseHelper;
+import com.example.refactore2drive.eyes.CamaraActivity;
 import com.example.refactore2drive.heart.BluetoothLeService;
 import com.example.refactore2drive.obd.BluetoothServiceOBD;
 import com.example.refactore2drive.obd.OBDConsumer;
-import com.example.refactore2drive.sessions.SessionFragment;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -265,7 +263,8 @@ public class InfoGridFragment extends Fragment {
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                         }
-                        if (!BluetoothServiceOBD.isRunning) Toast.makeText(
+                        boolean isRunning = ((MainActivity) requireActivity()).isMyServiceRunning(BluetoothServiceOBD.class);
+                        if (!isRunning) Toast.makeText(
                                 requireActivity(),
                                 "Error reconectando con OBD",
                                 Toast.LENGTH_SHORT
@@ -285,7 +284,7 @@ public class InfoGridFragment extends Fragment {
         }
     };
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.ASYNC)
     public void onMessageRecivedConsume(MessageEventGrid messageEventGrid) {
         switch (messageEventGrid.param) {
             case "dataSpeed":
@@ -408,6 +407,7 @@ public class InfoGridFragment extends Fragment {
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d("Servicio conectado", "El servicio esta up HEART");
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
             if (!mBluetoothLeService.initialize()) {
                 Log.e("LE", "No se puede inicializar el servicio LE");
@@ -417,6 +417,7 @@ public class InfoGridFragment extends Fragment {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            Log.d("Servicio desconectado", "EL servicio esta down HEART");
             mBluetoothLeService = null;
         }
     };
@@ -482,18 +483,20 @@ public class InfoGridFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.more_info:
-                startActivity(new Intent(requireActivity(), MoreInfoActivity.class));
-                return true;
-            case R.id.settings:
-                startActivity(new Intent(requireActivity(), UserConfigActivity.class));
-                return true;
-            case R.id.developer_mode:
-                startActivity(new Intent(requireActivity(), DeveloperModeActivity.class));
-                return true;
-            default:
-                return false;
+        int itemId = item.getItemId();
+        if (itemId == R.id.more_info) {
+            startActivity(new Intent(requireActivity(), MoreInfoActivity.class));
+            return true;
+        } else if (itemId == R.id.settings) {
+            startActivity(new Intent(requireActivity(), UserConfigActivity.class));
+            return true;
+        } else if (itemId == R.id.developer_mode) {
+            startActivity(new Intent(requireActivity(), DeveloperModeActivity.class));
+            return true;
+        } else if (itemId == R.id.camera) {
+            startActivity(new Intent(requireActivity(), CamaraActivity.class));
+            return true;
         }
+        return false;
     }
 }

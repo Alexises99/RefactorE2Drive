@@ -3,17 +3,12 @@ package com.example.refactore2drive;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.widget.Toast;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Helper {
 
-    public static void makeToast(Context context, String msg) {
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-    }
 
     public static int formatTime(LocalTime time) {
         int val;

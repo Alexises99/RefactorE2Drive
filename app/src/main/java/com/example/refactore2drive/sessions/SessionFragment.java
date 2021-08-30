@@ -16,7 +16,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -157,8 +156,6 @@ public class SessionFragment extends Fragment {
         });
     }
 
-
-
     private void requestPermission() {
         ActivityCompat.requestPermissions(requireActivity(), new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_EXTERNAL_STORAGE);
     }
@@ -222,19 +219,18 @@ public class SessionFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.more_info:
-                startActivity(new Intent(getActivity(), MoreInfoActivity.class));
-                return true;
-            case R.id.settings:
-                startActivity(new Intent(requireActivity(), UserConfigActivity.class));
-                return true;
-            case R.id.developer_mode:
-                startActivity(new Intent(requireActivity(), DeveloperModeActivity.class));
-                return true;
-            default:
-                return false;
+        int itemId = item.getItemId();
+        if (itemId == R.id.more_info) {
+            startActivity(new Intent(getActivity(), MoreInfoActivity.class));
+            return true;
+        } else if (itemId == R.id.settings) {
+            startActivity(new Intent(requireActivity(), UserConfigActivity.class));
+            return true;
+        } else if (itemId == R.id.developer_mode) {
+            startActivity(new Intent(requireActivity(), DeveloperModeActivity.class));
+            return true;
         }
+        return false;
     }
 
     private class SessionListAdapter extends BaseAdapter {

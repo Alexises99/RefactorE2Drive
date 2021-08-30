@@ -190,26 +190,21 @@ public class SignupActivity extends AppCompatActivity {
             //Si todos los campos estan bien se genera el string con el genero del usuario
             if (correct) {
                 String genre = null;
-                switch (radioGroup.getCheckedRadioButtonId()) {
-                    case R.id.radio_male:
-                        genre = "Hombre";
-                        break;
-                    case R.id.radio_female:
-                        genre = "Mujer";
-                        break;
-                    case R.id.radio_other:
-                        genre = "Otro";
-                        break;
-                    default:
-                        Toast.makeText(getApplicationContext(), "Seleccione un genero", Toast.LENGTH_SHORT).show();
-                        correct = false;
+                int checkedRadioButtonId = radioGroup.getCheckedRadioButtonId();
+                if (checkedRadioButtonId == R.id.radio_male) {
+                    genre = "Hombre";
+                } else if (checkedRadioButtonId == R.id.radio_female) {
+                    genre = "Mujer";
+                } else if (checkedRadioButtonId == R.id.radio_other) {
+                    genre = "Otro";
+                } else {
+                    Toast.makeText(getApplicationContext(), "Seleccione un genero", Toast.LENGTH_SHORT).show();
+                    correct = false;
                 }
                 if (correct) {
                     //Cuando es correcto se guardan en la base de datos
                     DatabaseHelper db = new DatabaseHelper(getApplicationContext());
                     //TODO Que no se pueda repetir el username.
-                    db.clearDB();
-                    db.initDB();
                     try {
                         db.createPerson(new Person(nameEdit.getText().toString(), usernameEdit.getText().toString(), Integer.parseInt(ageEdit.getText().toString()), genre, Integer.parseInt(heightEdit.getText().toString())));
                         Log.d("Persona", db.getPerson(usernameEdit.getText().toString()).toString());

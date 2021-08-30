@@ -1,5 +1,7 @@
 package com.example.refactore2drive.models;
 
+import androidx.annotation.NonNull;
+
 public class Device {
     String name;
     String address;
@@ -14,11 +16,6 @@ public class Device {
         this.nickname = nickname;
     }
 
-    public Device (String name, String address, String nickname, long id) {
-        this.name = name;
-        this.address = address;
-        this.nickname = nickname;
-    }
 
     public String getName() {
         return name;
@@ -52,6 +49,7 @@ public class Device {
         this.id = id;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Device{" +
