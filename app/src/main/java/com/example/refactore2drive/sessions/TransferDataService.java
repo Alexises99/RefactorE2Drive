@@ -24,6 +24,7 @@ public class TransferDataService extends Service {
     private Session odbSession;
     private Session heartSession;
 
+    //Recibe los datos del pulso y obd y los escribe
     private final BroadcastReceiver myBroadCastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -38,8 +39,17 @@ public class TransferDataService extends Service {
                     Log.d(TAG, "La longuitud del string es: " + def.length);
                     odbSession.writeData(list.toArray(def));
                 }
-            } else if (action.equals(BluetoothLeService.EXTRA_DATA)) {
-                String data = intent.getStringExtra("data");
+            }
+        }
+    };
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            Log.d("INTENT", "accion: " + action);
+            if (action.equals(BluetoothLeService.ACTION_DATA_AVAILABLE)) {
+                String data = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
                 Log.d("PULSO RECIBIDO", "pulso: " + data);
                 String[] def = new String[2];
                 def[0] = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
@@ -52,15 +62,21 @@ public class TransferDataService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(myBroadCastReceiver,initIntent());
+        registerReceiver(broadcastReceiver, intentFilter);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
             try{
+                //TODO arreglar sesiones
+                //Comienza las sesiones de ambos
                 odbSession = new Session(intent.getStringExtra("name"), intent.getStringArrayExtra("comment"),getApplicationContext().getFilesDir().getPath(),Headers.headersUnit,intent.getStringArrayExtra("data"));
-                heartSession = new Session(intent.getStringExtra("name") + "Heart", intent.getStringArrayExtra("comment"),getApplicationContext().getFilesDir().getPath(),Headers.headersHeart,intent.getStringArrayExtra("data"));
+                String heart = intent.getStringExtra("name") + "Heart";
+                heartSession = new Session(heart + ".csv", intent.getStringArrayExtra("comment"),getApplicationContext().getFilesDir().getPath(),Headers.headersHeart,intent.getStringArrayExtra("data"));
             } catch (Session.ErrorSDException error) {
                 Log.d("ERRORSD", "SD NO INSERTADA");
                 close();
@@ -77,6 +93,7 @@ public class TransferDataService extends Service {
     public void onDestroy() {
         super.onDestroy();
         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(myBroadCastReceiver);
+        unregisterReceiver(broadcastReceiver);
         close();
     }
 
@@ -85,10 +102,13 @@ public class TransferDataService extends Service {
         return null;
     }
 
+    /**
+     * Registra las escuchas de ambos
+     * @return un intentfilter con las acciones a escuchar
+     */
     private IntentFilter initIntent() {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(OBDConsumer.ACTION_SEND_DATA_OBD_SESSION);
-        intentFilter.addAction(BluetoothLeService.EXTRA_DATA);
         return intentFilter;
     }
 

@@ -1,5 +1,8 @@
 package com.example.refactore2drive.obd;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -9,11 +12,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.CursorIndexOutOfBoundsException;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,16 +21,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.refactore2drive.Helper;
-import com.example.refactore2drive.NavigationHost;
 import com.example.refactore2drive.R;
 import com.example.refactore2drive.ToastUtils;
 import com.example.refactore2drive.database.DatabaseHelper;
-import com.example.refactore2drive.heart.SelectWear;
+import com.example.refactore2drive.heart.SelectWearActivity;
 import com.example.refactore2drive.models.Device;
 
 import java.util.ArrayList;
 
-public class SelectOBD extends Fragment {
+public class SelectObdActivity extends AppCompatActivity {
     private SwitchCompat switchCompat;
     private DeviceListAdapter deviceListAdapter;
     private String username;
@@ -40,21 +37,17 @@ public class SelectOBD extends Fragment {
     private BluetoothAdapter myAdapter;
 
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        db = new DatabaseHelper(getActivity());
-        username = Helper.getUsername(getActivity());
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_select_o_b_d, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_select_obd);
+        db = new DatabaseHelper(this);
+        username = Helper.getUsername(this);
         myAdapter = BluetoothAdapter.getDefaultAdapter();
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        requireActivity().registerReceiver(mBroadcastReceiver, filter);
-        if (myAdapter == null) ToastUtils.show(requireActivity(), "Bluetooth no soportado");
-        switchCompat = view.findViewById(R.id.obd_switch);
+        registerReceiver(mBroadcastReceiver, filter);
+        if (myAdapter == null) ToastUtils.show(this, "Bluetooth no soportado");
+        switchCompat = findViewById(R.id.obd_switch);
+        //Alternar entre escanear o no
         switchCompat.setOnCheckedChangeListener((compoundButton, b) -> {
             deviceListAdapter.clear();
             deviceListAdapter.notifyDataSetChanged();
@@ -68,16 +61,15 @@ public class SelectOBD extends Fragment {
                 }
             }
         });
-        ListView listView = view.findViewById(R.id.obd_list);
+        ListView listView = findViewById(R.id.obd_list);
         deviceListAdapter = new DeviceListAdapter();
         listView.setAdapter(deviceListAdapter);
         listView.setOnItemClickListener((parent, view1, position, id) -> {
             BluetoothDevice device = deviceListAdapter.getDevice(position);
             db.createObd(new Device(device.getName(), device.getAddress(), username));
             myAdapter.cancelDiscovery();
-            ((NavigationHost) requireActivity()).navigateTo(new SelectWear(), false);
+            startActivity(new Intent(this, SelectWearActivity.class));
         });
-        return view;
     }
 
     private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
@@ -93,12 +85,12 @@ public class SelectOBD extends Fragment {
     };
 
     @Override
-    public void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
         if (!myAdapter.isEnabled()) myAdapter.enable();
         try {
             db.getObd(username);
-            ((NavigationHost) requireActivity()).navigateTo(new SelectWear(), false);
+            startActivity(new Intent(this, SelectWearActivity.class));
         } catch (CursorIndexOutOfBoundsException e) {
             Log.e("dispositivo no guardado", "no guardado");
         }
@@ -109,10 +101,10 @@ public class SelectOBD extends Fragment {
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    protected void onPause() {
         deviceListAdapter.clear();
         db.closeDB();
+        super.onPause();
     }
 
     private class DeviceListAdapter extends BaseAdapter {
@@ -122,7 +114,7 @@ public class SelectOBD extends Fragment {
         public DeviceListAdapter() {
             super();
             mDevices = new ArrayList<>();
-            mInflator = SelectOBD.this.getLayoutInflater();
+            mInflator = getLayoutInflater();
         }
 
         public void addDevice(BluetoothDevice device) {

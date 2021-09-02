@@ -36,12 +36,15 @@ public class DeveloperModeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_developer_mode);
         tableLayout = findViewById(R.id.table_commands_dev);
         linearLayout = findViewById(R.id.linear_dev);
+        //Paramos el servicio por si acaso
         stopService(new Intent(this, BluetoothServiceOBD.class));
         DatabaseHelper db = new DatabaseHelper(this);
         String username = Helper.getUsername(this);
         String address = db.getObd(username).getAddress();
+        //Lanzamos el servicio
         Intent intent = new Intent(this, BluetoothServiceOBD.class);
         intent.putExtra("deviceAddress", address);
+        //Indicamos que estamos en modo desarrollador
         intent.putExtra("dev", true);
         startService(intent);
         Toolbar toolbar = findViewById(R.id.dev_app_bar);
@@ -85,6 +88,13 @@ public class DeveloperModeActivity extends AppCompatActivity {
         stopService(new Intent(this, BluetoothServiceOBD.class));
     }
 
+    /**
+     * Se encarga de actualizar el tableview, si un comando es nuevo inserta una fila sino unicamente
+     * la actualiza
+     * @param id del comando
+     * @param name del comando
+     * @param res resultado del comando
+     */
     public void updateTable(String id, String name, String res) {
         if (linearLayout.findViewWithTag(id) != null) {
             TextView existingTV = linearLayout.findViewWithTag(id);
@@ -94,6 +104,12 @@ public class DeveloperModeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Añade una fila a la tavla
+     * @param id
+     * @param key
+     * @param val
+     */
     private void addTableRow(String id, String key, String val) {
         TableRow tr = new TableRow(this);
         tr.setGravity(Gravity.CENTER);

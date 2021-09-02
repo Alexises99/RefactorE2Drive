@@ -7,10 +7,8 @@ import java.util.concurrent.BlockingQueue;
 
 
 public class OBDProducer implements Runnable{
-    private BlockingQueue<OBDCommandJob> queue;
-    private ArrayList<ObdCommand> list;
-
-    private static final String TAG = OBDProducer.class.getName();
+    private final BlockingQueue<OBDCommandJob> queue;
+    private final ArrayList<ObdCommand> list;
 
     /**
      * Hilo productor de comandos que inserta en la cola y los recoge de la lista

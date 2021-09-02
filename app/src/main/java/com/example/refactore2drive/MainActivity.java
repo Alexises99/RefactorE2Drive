@@ -32,12 +32,10 @@ import com.example.refactore2drive.call.CallFragment;
 import com.example.refactore2drive.chart.ChartFragment;
 import com.example.refactore2drive.chart.Value;
 import com.example.refactore2drive.controlpanel.InfoGridFragment;
-import com.example.refactore2drive.database.DatabaseHelper;
 import com.example.refactore2drive.eyes.CameraSourcePreview;
 import com.example.refactore2drive.eyes.FaceTracker;
 import com.example.refactore2drive.eyes.GraphicOverlay;
 import com.example.refactore2drive.heart.BluetoothLeService;
-import com.example.refactore2drive.login.LoginFragment;
 import com.example.refactore2drive.models.SessionModel;
 import com.example.refactore2drive.sessions.SessionFragment;
 import com.google.android.gms.common.ConnectionResult;
@@ -61,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements NavigationHost{
     private static final String TAG = MainActivity.class.getName();
     public static long prevSpeed = -1;
     public static long prevConsume = -1;
+    public static int prevHeart = -1;
     public static SessionModel sessionModel;
     public static boolean sessionStarted;
     private CameraSource mCameraSource = null;
@@ -69,14 +68,13 @@ public class MainActivity extends AppCompatActivity implements NavigationHost{
     private final boolean mIsFrontFacing = true;
     private static final int RC_HANDLE_GMS =  9001;
     public static BluetoothLeService mBluetoothLeService;
-    private BluetoothGattCharacteristic mNotifyCharacteristic;
-    private DatabaseHelper db;
+    public static String status = "Desconocido";
+    BluetoothGattCharacteristic mNotifyCharacteristic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        db = new DatabaseHelper(this);
         mPreview = findViewById(R.id.preview);
         mGraphicOverlay = findViewById(R.id.faceOverlay);
         mPreview.setVisibility(View.INVISIBLE);
@@ -104,10 +102,9 @@ public class MainActivity extends AppCompatActivity implements NavigationHost{
             return false;
         });
         if (savedInstanceState ==  null) {
-            nav.setVisibility(View.INVISIBLE);
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.container, new LoginFragment())
+                    .add(R.id.container, new InfoGridFragment())
                     .commit();
         }
     }
@@ -156,25 +153,6 @@ public class MainActivity extends AppCompatActivity implements NavigationHost{
         return detector;
     }
 
-    private final ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d("Servicio conectado", "El servicio esta up HEART");
-            mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            if (!mBluetoothLeService.initialize()) {
-                Log.e("LE", "No se puede inicializar el servicio LE");
-            }
-            mBluetoothLeService.connect(db.getWear(Helper.getUsername(MainActivity.this)).getAddress());
-            mBluetoothLeService.connect(db.getWear(Helper.getUsername(MainActivity.this)).getAddress());
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Log.d("Servicio desconectado", "EL servicio esta down HEART");
-            mBluetoothLeService = null;
-        }
-    };
-
     /**
      * Creates the face detector and the camera.
      */
@@ -196,6 +174,22 @@ public class MainActivity extends AppCompatActivity implements NavigationHost{
                 .build();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //startCameraSource();
+        IntentFilter heartReceiver = new IntentFilter();
+        heartReceiver.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+        heartReceiver.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
+        heartReceiver.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
+        heartReceiver.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
+        heartReceiver.addAction(BluetoothLeService.EXTRA_DATA);
+        registerReceiver(mGattUpdateReceiver, heartReceiver);
+        Log.d("Entre pulso", "sali pulso");
+        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
+        bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -203,17 +197,15 @@ public class MainActivity extends AppCompatActivity implements NavigationHost{
             Log.d("ACCION", action);
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 Log.d("HEART", "conectado");
+                MainActivity.status = "Conectado";
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.d("HEART", "desconectado");
+                MainActivity.status = "Desconectado";
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 displayGattServices(MainActivity.mBluetoothLeService.getSupportedGattServices());
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 String data = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
                 Log.d("DATA CORAZON", data);
-                //updateSingleItem(data, 2);
-                int x = Helper.formatTime(LocalTime.now());
-                Value value = new Value((long) x,(long) Long.parseLong(data), Helper.getUsername(MainActivity.this), LocalDate.now().toString());
-                db.createDataHeart(value);
             }
         }
     };
@@ -245,30 +237,33 @@ public class MainActivity extends AppCompatActivity implements NavigationHost{
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        //startCameraSource();
-        Log.d("MainActivity", "me resumi");
-        IntentFilter heartReceiver = new IntentFilter();
-        heartReceiver.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
-        heartReceiver.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
-        heartReceiver.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
-        heartReceiver.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
-        heartReceiver.addAction(BluetoothLeService.EXTRA_DATA);
-        registerReceiver(mGattUpdateReceiver, heartReceiver);
-        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
-        bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    @Override
     protected void onPause() {
-        Log.d("MainActivity", "me escondi");
         mBluetoothLeService.disconnect();
         mBluetoothLeService.close();
         unbindService(mServiceConnection);
         unregisterReceiver(mGattUpdateReceiver);
         super.onPause();
     }
+
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d("Servicio conectado", "El servicio esta up HEART");
+            mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
+            if (!mBluetoothLeService.initialize()) {
+                Log.e("LE", "No se puede inicializar el servicio LE");
+            }
+            mBluetoothLeService.connect("C3:B1:DA:EB:BE:AE");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.d("Servicio desconectado", "EL servicio esta down HEART");
+            mBluetoothLeService = null;
+        }
+    };
+
+
 
     private void startCameraSource() {
         // check that the device has play services available.

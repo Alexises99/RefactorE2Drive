@@ -52,7 +52,7 @@ public class BluetoothServiceOBD extends Service {
     private final ArrayList<ObdCommand> obdCommands = new ArrayList<>();
     static InputStream inputStream;
     static OutputStream outputStream;
-    private BlockingQueue<OBDCommandJob> jobsQueue = new LinkedBlockingDeque<>(500);
+    private final BlockingQueue<OBDCommandJob> jobsQueue = new LinkedBlockingDeque<>(500);
     private Thread producer;
     private ConnectedThread connectedThread;
     private ConnectingThread connectingThread;

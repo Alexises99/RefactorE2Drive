@@ -2,8 +2,6 @@ package com.example.refactore2drive.obd;
 
 import com.github.pires.obd.commands.ObdCommand;
 
-import java.io.Serializable;
-
 public class OBDCommandJob {
     private Long _id;
     private ObdCommand _command;

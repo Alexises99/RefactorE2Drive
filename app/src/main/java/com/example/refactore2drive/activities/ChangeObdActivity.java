@@ -36,6 +36,10 @@ public class ChangeObdActivity extends AppCompatActivity {
         ListView listView = findViewById(R.id.obd_select_list);
         deviceListAdapter = new DeviceListAdapter();
         listView.setAdapter(deviceListAdapter);
+        /*
+            Representa la misma actividad para seleccionar ambos dispositivos,
+            se elige según el "mode" que le llega
+         */
         if (getIntent().getStringExtra("mode").equals("obd")) {
             listView.setOnItemClickListener((parent, view1, position, id) -> {
                 BluetoothDevice device = deviceListAdapter.getDevice(position);
@@ -64,6 +68,7 @@ public class ChangeObdActivity extends AppCompatActivity {
 
         BluetoothAdapter myAdapter = BluetoothAdapter.getDefaultAdapter();
         if (myAdapter == null) return;
+        //Se añaden los dispositivos a la lista
         for (BluetoothDevice device : myAdapter.getBondedDevices()) {
             deviceListAdapter.addDevice(device);
             deviceListAdapter.notifyDataSetChanged();

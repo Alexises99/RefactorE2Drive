@@ -53,7 +53,6 @@ public class SessionFragment extends Fragment {
     private SessionListAdapter sessionListAdapter;
     private ListView listSessions;
     private MaterialButton startSession, endSession;
-    //private SessionModel sessionModel;
     private TextInputEditText commentEdit;
     private String username;
     private DatabaseHelper db;
@@ -85,6 +84,7 @@ public class SessionFragment extends Fragment {
         super.onResume();
         db = new DatabaseHelper(getActivity());
         username = Helper.getUsername(getActivity());
+        //Recogemos todas las sesiones y las ponemos
         ArrayList<SessionModel> arrayList = new ArrayList<>(db.getSessions(username));
         arrayList.forEach(sessionModel1 -> sessionListAdapter.addSession(sessionModel1));
         sessionListAdapter.notifyDataSetChanged();
@@ -105,6 +105,7 @@ public class SessionFragment extends Fragment {
 
     private void listeners() {
         startSession.setOnClickListener(view -> {
+            //Comprobamos permisos de escritura
             if (ContextCompat.checkSelfPermission(requireActivity(),
                     Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -114,12 +115,14 @@ public class SessionFragment extends Fragment {
                     requestPermission();
                 }
             }
+            //Deshabilitamos botones
             startSession.setEnabled(false);
             endSession.setEnabled(true);
             Intent intent = new Intent(getActivity(), BluetoothServiceOBD.class);
             intent.putExtra("deviceAddress",db.getObd(username).getAddress());
             intent.putExtra("mode", true);
             requireActivity().startService(intent);
+            //Configuramos la sesión
             MainActivity.sessionStarted = true;
             String iniTime = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
             MainActivity.sessionModel = new SessionModel();
@@ -129,8 +132,9 @@ public class SessionFragment extends Fragment {
             String init = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
             String[] comment = new String[1];
             comment[0] = Objects.requireNonNull(commentEdit.getText()).toString();
+            //Lanzamos el servicio de transferencia con los datos adecuados
             Intent intent1 = new Intent(getActivity(), TransferDataService.class);
-            intent1.putExtra("name", username+"-"+init+".csv");
+            intent1.putExtra("name", username+"-"+init);
             intent1.putExtra("comment", comment);
             intent1.putExtra("data", loadDataPerson());
             requireActivity().startService(intent1);
@@ -144,9 +148,9 @@ public class SessionFragment extends Fragment {
             sessionListAdapter.addSession(MainActivity.sessionModel);
             sessionListAdapter.notifyDataSetChanged();
             MainActivity.sessionModel = null;
+            //Detenemos ambos servicios para ahorrar recursos
             requireActivity().stopService(new Intent(getActivity(), TransferDataService.class));
             requireActivity().stopService(new Intent(getActivity(), BluetoothServiceOBD.class));
-
         });
         listSessions.setOnItemClickListener((adapterView, view, i, l) -> {
             SessionModel session = sessionListAdapter.getSession(i);
@@ -161,8 +165,8 @@ public class SessionFragment extends Fragment {
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
         new AlertDialog.Builder(requireActivity())
                 .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Aceptar", okListener)
+                .setNegativeButton("Cancelar", null)
                 .create()
                 .show();
     }
@@ -185,6 +189,10 @@ public class SessionFragment extends Fragment {
         dialog.show();
     }
 
+    /**
+     * Carga los datos de la persona para ser escritos en el csv
+     * @return todos los datos de la persona en un String de una unica posición
+     */
     private String[] loadDataPerson() {
         try {
             Person person = db.getPerson(username);

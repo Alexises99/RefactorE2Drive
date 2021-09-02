@@ -2,14 +2,11 @@ package com.example.refactore2drive.call;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.example.refactore2drive.NavigationHost;
 import com.example.refactore2drive.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -20,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class AddContactActivity extends AppCompatActivity implements NavigationHost {
+public class AddContactActivity extends AppCompatActivity {
 
     public static final String ACTION_ADD_CONTACT = "com.example_ACTION_ADD_CONTACT";
 
@@ -60,18 +57,6 @@ public class AddContactActivity extends AppCompatActivity implements NavigationH
                 finish();
             }
         });
-    }
-
-    @Override
-    public void navigateTo(Fragment fragment, boolean addToBackStack) {
-        FragmentTransaction transaction =
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.container, fragment);
-        if (addToBackStack) {
-            transaction.addToBackStack(null);
-        }
-        transaction.commit();
     }
 
     /**

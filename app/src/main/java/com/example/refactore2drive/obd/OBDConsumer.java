@@ -32,7 +32,7 @@ public class OBDConsumer implements Runnable{
     public final static String ACTION_SEND_DATA_FUEL="ACTION_OBD_DATA_FUEL";
     public final static String ACTION_DISCONNECTED="com.example_ACTION_DISCONNECTED";
     private final static String TAG = OBDConsumer.class.getName();
-    private HashMap<String, String> commandResults;
+    private final HashMap<String, String> commandResults;
     private final HashMap<String, String> filter;
     public ArrayList<String> collectedData;
     private final boolean mode;

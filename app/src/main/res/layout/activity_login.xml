@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".login.LoginFragment"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:padding="24dp"
+    android:paddingTop="16dp"
+    android:orientation="vertical" >
+
+    <ImageView
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="48dp"
+        android:layout_marginBottom="16dp"
+        app:srcCompat="@drawable/ic_logo"
+        android:contentDescription="Icono" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/username_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Widget.Shrine.TextInputLayout"
+        app:startIconDrawable="@drawable/ic_person_login"
+        app:helperTextEnabled="true"
+        app:errorEnabled="true"
+        app:helperText="Introduce tu nombre de usuario"
+        android:hint="Username" >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/username_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:maxLines="1"
+            android:text="ubuntin" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/password_input"
+        style="@style/Widget.Shrine.TextInputLayout"
+        app:startIconDrawable="@drawable/ic_password"
+        app:endIconMode="password_toggle"
+        app:helperTextEnabled="true"
+        app:helperText="Introduce tu contraseña"
+        android:hint="Password"
+        app:errorEnabled="true" >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/password_edit"
+            android:inputType="textPassword"
+            android:text="12345678" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.Shrine.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="Siguiente"
+            android:id="@+id/next_button_login" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/cancel_button_login"
+            style="@style/Widget.Shrine.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:layout_toStartOf="@id/next_button_login"
+            android:text="Registrarse" />
+
+    </RelativeLayout>
+
+</LinearLayout>

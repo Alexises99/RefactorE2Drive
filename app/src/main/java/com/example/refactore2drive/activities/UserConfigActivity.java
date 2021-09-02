@@ -102,6 +102,9 @@ public class UserConfigActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Cargamos todos los datos de la persona y los reflejamos en la ui
+     */
     private void load() {
         Person person = db.getPerson(username);
         ArrayList<Disease> diseases =  new ArrayList<>(db.getInjuries(username));
@@ -236,6 +239,7 @@ public class UserConfigActivity extends AppCompatActivity {
                 }
                 if (correct) {
                     try {
+                        //Guardamos los datos en la base de datos.
                         Account account = db.getAccount(username);
                         account.setPassword(passwordEdit.getText().toString());
                         db.updateAccount(account);
@@ -265,7 +269,7 @@ public class UserConfigActivity extends AppCompatActivity {
         });
     }
 
-        private boolean isTextValid(@Nullable Editable text) {
-            return text != null && text.length() > 0;
-        }
+    private boolean isTextValid(@Nullable Editable text) {
+        return text != null && text.length() > 0;
+    }
 }

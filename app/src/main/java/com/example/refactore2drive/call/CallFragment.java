@@ -70,7 +70,7 @@ public class CallFragment extends Fragment {
 
         RecyclerView recyclerView = view.findViewById(R.id.call_recycler);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false));
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 5, GridLayoutManager.VERTICAL, false));
         username = Helper.getUsername(getActivity());
         try {
             /*Se recuperan todos los contactos y se comprueba si se tiene el permiso para realizar
@@ -102,15 +102,24 @@ public class CallFragment extends Fragment {
         }
         return view;
     }
+
+    /**
+     * Petición de los permisos al usuario
+     */
     private void requestPermission() {
         ActivityCompat.requestPermissions(requireActivity(), new String[] {Manifest.permission.CALL_PHONE}, REQUEST_CALL);
     }
 
+    /**
+     * Muestra el dialogo para cancelar o aceptar los permisos
+     * @param message mensaje a mostrar para explicar los permisos
+     * @param okListener listener para ver que hacer cuando el usuario presiona en OK
+     */
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
         new AlertDialog.Builder(requireActivity())
                 .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Aceptar", okListener)
+                .setNegativeButton("Cancelar", null)
                 .create()
                 .show();
     }
@@ -143,7 +152,9 @@ public class CallFragment extends Fragment {
         LocalBroadcastManager.getInstance(requireActivity()).unregisterReceiver(myContactReceiver);
     }
 
-
+    /**
+     * Recividor de los eventos de añadir contacto
+     */
     private final BroadcastReceiver myContactReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
