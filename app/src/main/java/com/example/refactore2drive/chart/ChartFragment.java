@@ -169,6 +169,10 @@ public class ChartFragment extends Fragment {
         return db.getDataSpeedByDate(username, date.toString());
     }
 
+    private List<Value> getDataHeart(LocalDate date) {
+        return db.getDataHeartByDate(username, date.toString());
+    }
+
     private void configureLegend(Legend legend) {
         legend.setFormSize(10f);
         legend.setForm(Legend.LegendForm.CIRCLE);
@@ -195,18 +199,24 @@ public class ChartFragment extends Fragment {
         ArrayList<Value> values1 = new ArrayList<>(getDataSpeed(date));
         ArrayList<Entry> list1 = process(values1);
 
+        ArrayList<Value> values2 = new ArrayList<>(getDataHeart(date));
+        ArrayList<Entry> list2 = process(values2);
+
         //Nueva linea de datos y su etiqueta
         LineDataSet lineDataSet = new LineDataSet(list, "Consumo");
         LineDataSet lineDataSet1 = new LineDataSet(list1, "Velocidad");
+        LineDataSet lineDataSet2 = new LineDataSet(list2, "Pulso");
 
         //Configuración de ambas lineas
         configureLine(lineDataSet, 76, 146, 177);
         configureLine(lineDataSet1, 228,142,88);
+        configureLine(lineDataSet2, 238, 47, 127);
 
         //Union de todas en una estructura de datos
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
         dataSets.add(lineDataSet);
         dataSets.add(lineDataSet1);
+        dataSets.add(lineDataSet2);
 
         //Linea de datos final
         LineData data = new LineData(dataSets);

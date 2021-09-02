@@ -11,6 +11,7 @@ import android.util.Log;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
+import com.example.refactore2drive.heart.BluetoothLeService;
 import com.example.refactore2drive.obd.OBDConsumer;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 public class TransferDataService extends Service {
     private static final String TAG = TransferDataService.class.getName();
     private Session odbSession;
-    //private Session heartSession;
+    private Session heartSession;
 
     private final BroadcastReceiver myBroadCastReceiver = new BroadcastReceiver() {
         @Override
@@ -30,21 +31,20 @@ public class TransferDataService extends Service {
             Log.d("INTENT", "accion: " + action);
             if (action.equals(OBDConsumer.ACTION_SEND_DATA_OBD_SESSION)) {
                 Log.d("Extras",intent.getExtras().toString());
-                //TODO No funciona
                 ArrayList<String> list = intent.getStringArrayListExtra("lista");
                 Log.d("Array", "data: " + list.toString());
                 if (odbSession != null) {
                     String[] def = new String[list.size()];
                     Log.d(TAG, "La longuitud del string es: " + def.length);
                     odbSession.writeData(list.toArray(def));
-                }   //TODO esta mal la accion del elseif
-            } else if (action.equals(OBDConsumer.ACTION_SEND_DATA_CONSUME)) {
+                }
+            } else if (action.equals(BluetoothLeService.EXTRA_DATA)) {
                 String data = intent.getStringExtra("data");
                 Log.d("PULSO RECIBIDO", "pulso: " + data);
                 String[] def = new String[2];
                 def[0] = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
                 def[1] = data;
-                //if (heartSession != null) heartSession.writeData(def);
+                if (heartSession != null) heartSession.writeData(def);
             }
         }
     };
@@ -60,7 +60,7 @@ public class TransferDataService extends Service {
         try {
             try{
                 odbSession = new Session(intent.getStringExtra("name"), intent.getStringArrayExtra("comment"),getApplicationContext().getFilesDir().getPath(),Headers.headersUnit,intent.getStringArrayExtra("data"));
-                //heartSession = new Session(intent.getStringExtra("name") + "Heart", intent.getStringArrayExtra("comment"),getApplicationContext().getFilesDir().getPath(),Headers.headersHeart,intent.getStringArrayExtra("data"));
+                heartSession = new Session(intent.getStringExtra("name") + "Heart", intent.getStringArrayExtra("comment"),getApplicationContext().getFilesDir().getPath(),Headers.headersHeart,intent.getStringArrayExtra("data"));
             } catch (Session.ErrorSDException error) {
                 Log.d("ERRORSD", "SD NO INSERTADA");
                 close();
@@ -88,15 +88,15 @@ public class TransferDataService extends Service {
     private IntentFilter initIntent() {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(OBDConsumer.ACTION_SEND_DATA_OBD_SESSION);
-        //intentFilter.addAction(MainActivity.ACTION_SEND_DATA_HEART);
+        intentFilter.addAction(BluetoothLeService.EXTRA_DATA);
         return intentFilter;
     }
 
     public void close() {
         if (odbSession ==  null) return;
         odbSession.close();
-        //heartSession.close();
+        heartSession.close();
         odbSession = null;
-        //heartSession = null;
+        heartSession = null;
     }
 }

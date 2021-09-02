@@ -246,10 +246,11 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/disease_input_reg"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 style="@style/Widget.Shrine.TextInputLayout"
                 android:hint="Patologia"
                 android:layout_alignParentStart="true"
+                android:layout_toLeftOf="@id/addDisease"
                 app:errorEnabled="true"
                 android:layout_marginEnd="8dp" >
 

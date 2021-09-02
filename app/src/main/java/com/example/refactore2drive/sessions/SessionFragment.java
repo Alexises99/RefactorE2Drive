@@ -57,8 +57,6 @@ public class SessionFragment extends Fragment {
     private TextInputEditText commentEdit;
     private String username;
     private DatabaseHelper db;
-    public static final String ACTION_SESSION_START = "com.example_ACTION_SESSION_START";
-    public static final String ACTION_SESSION_END = "com.example_ACTION_SESSION_END";
     public static final int REQUEST_EXTERNAL_STORAGE = 2000;
 
     @Override
@@ -125,7 +123,7 @@ public class SessionFragment extends Fragment {
             MainActivity.sessionStarted = true;
             String iniTime = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
             MainActivity.sessionModel = new SessionModel();
-            MainActivity.sessionModel.setName("test"+iniTime+".csv");
+            MainActivity.sessionModel.setName(username+iniTime+".csv");
             MainActivity.sessionModel.settIni(iniTime);
             MainActivity.sessionModel.setUsername(username);
             String init = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);

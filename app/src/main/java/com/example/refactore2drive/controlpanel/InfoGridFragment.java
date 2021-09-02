@@ -56,10 +56,9 @@ public class InfoGridFragment extends Fragment {
     private LocalBroadcastManager bm;
     private List<InfoEntry> infoEntryList;
     InfoCardRecyclerViewAdapter adapter;
-    private BluetoothLeService mBluetoothLeService;
     private BluetoothGattCharacteristic mNotifyCharacteristic;
     private DatabaseHelper db;
-    private TextView statusText;
+    private TextView statusObd, statusHeart;
     private static final String ARG_PARAM1 = "param1";
     private String mParam1;
     private String username;
@@ -81,10 +80,8 @@ public class InfoGridFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        Log.d("Holis", "aki etoy");
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
-            Log.d("PARAM", mParam1);
         }
     }
 
@@ -98,14 +95,11 @@ public class InfoGridFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_info_grid, container, false);
         setUpToolbar(view);
-        if (mBluetoothLeService != null){
-            //Conexión con la pulsera
-            final boolean result = mBluetoothLeService.connect(mParam1);
-            Log.d("Result", String.valueOf(result));
-        }
+
 
         //Inicialización de la vista
-        statusText = view.findViewById(R.id.status_obd);
+        statusObd = view.findViewById(R.id.status_obd);
+        statusHeart = view.findViewById(R.id.status_heart);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
 
         //Configuración del recycler view
@@ -128,7 +122,7 @@ public class InfoGridFragment extends Fragment {
          */
         Log.d("BAck", "estoy en el back");
         try {
-            requireActivity().unbindService(mServiceConnection);
+            //requireActivity().unbindService(mServiceConnection);
         }catch (NullPointerException e) {
             Log.e("error", "error no esperado");
         } finally {
@@ -138,7 +132,7 @@ public class InfoGridFragment extends Fragment {
             if (!MainActivity.sessionStarted && isRunning) requireActivity().stopService(new Intent(getActivity(), BluetoothServiceOBD.class));
             bm.unregisterReceiver(onDataReceived);
             bm.unregisterReceiver(onStatusReceiver);
-            bm.unregisterReceiver(mGattUpdateReceiver);
+            //bm.unregisterReceiver(mGattUpdateReceiver);
             db.closeDB();
         }
     }
@@ -158,7 +152,6 @@ public class InfoGridFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("holaa", "aka andi");
 
         //Obtenemos la base de datos y el usuario
         db = new DatabaseHelper(getActivity());
@@ -169,25 +162,24 @@ public class InfoGridFragment extends Fragment {
 
         //Conexión con el servicio de la pulsera
         Intent gattServiceIntent = new Intent(getActivity(), BluetoothLeService.class);
-        try{
+        /*try{
             requireActivity().bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
         } catch (NullPointerException e) {
             Log.e("error", "error inesperado");
-        }
+        }*/
 
         //Iniciación de los filtros que manejaran los intents
         IntentFilter dataReceiver = startFilterObd();
-        IntentFilter heartReceiver = startFilterHearth();
+        //IntentFilter heartReceiver = startFilterHearth();
         IntentFilter status = startFilterStatus();
 
         //Registro de estos en el BroadcastManager
         bm.registerReceiver(onStatusReceiver,status);
         bm.registerReceiver(onDataReceived, dataReceiver);
-        bm.registerReceiver(mGattUpdateReceiver, heartReceiver);
+        //bm.registerReceiver(mGattUpdateReceiver, heartReceiver);
 
         //Comprobación de que el servicio no se este ejecutando ahora mismo y si no es así lanzarlo
         boolean isRunning = ((MainActivity) requireActivity()).isMyServiceRunning(BluetoothServiceOBD.class);
-        Log.d("El servicio esta en ejecucion ", "" + isRunning);
         if (!isRunning) {
             Intent intent = new Intent(getActivity(), BluetoothServiceOBD.class);
             intent.putExtra("mode", false);
@@ -252,7 +244,7 @@ public class InfoGridFragment extends Fragment {
                 final String action = intent.getAction();
                 switch (action) {
                     case OBDConsumer.ACTION_DISCONNECTED:
-                        statusText.setText("Desconectado");
+                        statusObd.setText("Desconectado");
                         requireActivity().stopService(new Intent(requireActivity(), BluetoothServiceOBD.class));
                         try {
                             Thread.sleep(1000);
@@ -271,13 +263,13 @@ public class InfoGridFragment extends Fragment {
                             ).show();
                         break;
                     case BluetoothServiceOBD.ACTION_CONNECTION_CONNECTED:
-                        statusText.setText("Conectado");
+                        statusObd.setText("Conectado");
                         break;
                     case BluetoothServiceOBD.ACTION_CONNECTION_CONNECTING:
-                        statusText.setText("Conectando");
+                        statusObd.setText("Conectando");
                         break;
                     case BluetoothServiceOBD.ACTION_CONNECTION_FAILED:
-                        statusText.setText("Conexión Fallida");
+                        statusObd.setText("Conexión Fallida");
                         break;
                 }
             }
@@ -404,68 +396,6 @@ public class InfoGridFragment extends Fragment {
     }
 
     //HEART
-    private final ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d("Servicio conectado", "El servicio esta up HEART");
-            mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            if (!mBluetoothLeService.initialize()) {
-                Log.e("LE", "No se puede inicializar el servicio LE");
-            }
-            mBluetoothLeService.connect(mParam1);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Log.d("Servicio desconectado", "EL servicio esta down HEART");
-            mBluetoothLeService = null;
-        }
-    };
-
-    private void displayGattServices(List<BluetoothGattService> gattServices) {
-        if (gattServices == null) {
-            return;
-        }
-        String uuid;
-        for (BluetoothGattService gattService : gattServices) {
-            uuid = gattService.getUuid().toString();
-            if (uuid.equals("0000180d-0000-1000-8000-00805f9b34fb")) {
-                BluetoothGattCharacteristic characteristic = gattService.getCharacteristic(UUID.fromString("00002a37-0000-1000-8000-00805f9b34fb"));
-                final int charaProp = characteristic.getProperties();
-                if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
-                    if (mNotifyCharacteristic != null) {
-                        mBluetoothLeService.setCharacteristicNotification(mNotifyCharacteristic, false);
-                        mNotifyCharacteristic = null;
-                    }
-                    mBluetoothLeService.readCharacteristic(characteristic);
-                }
-                if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
-                    mNotifyCharacteristic = characteristic;
-                    mBluetoothLeService.setCharacteristicNotification(characteristic, true);
-                }
-                return;
-            }
-        }
-    }
-
-    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-                Log.d("HEART", "conectado");
-            } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                Log.d("HEART", "desconectado");
-            } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                displayGattServices(mBluetoothLeService.getSupportedGattServices());
-            } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                String data = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
-                Log.d("DATA CORAZON", data);
-                updateSingleItem(data, 2);
-            }
-        }
-    };
-
 
     private void setUpToolbar(View view) {
         Toolbar toolbar = view.findViewById(R.id.app_bar);

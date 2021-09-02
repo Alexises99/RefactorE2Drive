@@ -35,8 +35,7 @@ public class Session {
         this.name = name;
         Boolean[] bools = checkExternalStorage();
         if (!(bools[0] == false || bools[1] == false)) {
-            //TODO el directorio no funciona
-            File file = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "e2drive" + File.separator + this.name);
+            File file = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + this.name);
             if (!file.exists()) {
                 this.writer = new CSVWriter(new FileWriter(file, false), CSVWriter.DEFAULT_SEPARATOR, CSVWriter.NO_QUOTE_CHARACTER, CSVWriter.DEFAULT_ESCAPE_CHARACTER, CSVWriter.DEFAULT_LINE_END);
             } else {
