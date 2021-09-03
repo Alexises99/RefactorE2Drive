@@ -27,7 +27,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -37,8 +36,8 @@ import com.example.refactore2drive.activities.MoreInfoActivity;
 import com.example.refactore2drive.activities.UserConfigActivity;
 import com.example.refactore2drive.call.CallFragment;
 import com.example.refactore2drive.chart.ChartFragment;
-import com.example.refactore2drive.chart.Value;
 import com.example.refactore2drive.controlpanel.InfoGridFragment;
+import com.example.refactore2drive.eyes.CamaraActivity;
 import com.example.refactore2drive.eyes.CameraSourcePreview;
 import com.example.refactore2drive.eyes.FaceTracker;
 import com.example.refactore2drive.eyes.GraphicOverlay;
@@ -57,8 +56,6 @@ import com.google.android.gms.vision.face.LargestFaceFocusingProcessor;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -77,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements NavigationHost{
     public static BluetoothLeService mBluetoothLeService;
     public static String status = "Desconocido";
     BluetoothGattCharacteristic mNotifyCharacteristic;
+    private boolean sound = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements NavigationHost{
     @Override
     protected void onResume() {
         super.onResume();
-        //startCameraSource();
+        startCameraSource();
         IntentFilter heartReceiver = new IntentFilter();
         heartReceiver.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
         heartReceiver.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
@@ -262,6 +260,13 @@ public class MainActivity extends AppCompatActivity implements NavigationHost{
         } else if (itemId == R.id.developer_mode) {
             startActivity(new Intent(this, DeveloperModeActivity.class));
             return true;
+        } else if (itemId == R.id.camera) {
+            startActivity(new Intent(this, CamaraActivity.class));
+            return true;
+        } else if (itemId == R.id.silence) {
+            sound = !sound;
+            if (sound) Toast.makeText(this, "Sonido habilitado", Toast.LENGTH_SHORT).show();
+            else Toast.makeText(this, "Sonido deshabilitado", Toast.LENGTH_SHORT).show();
         }
         return false;
     }

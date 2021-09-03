@@ -1,13 +1,11 @@
 package com.example.refactore2drive.login;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -17,6 +15,7 @@ import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.widget.Toast;
 
+import com.example.refactore2drive.Helper;
 import com.example.refactore2drive.R;
 import com.example.refactore2drive.database.DatabaseHelper;
 import com.example.refactore2drive.models.Account;
@@ -29,28 +28,35 @@ import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
 
-    public static final int REQUEST_LOCATION = 3000;
+    private TextInputLayout usernameInput;
+    private TextInputEditText usernameEdit;
+    private TextInputLayout passwordInput;
+    private TextInputEditText passwordEdit;
+    private MaterialButton nextButton;
+    private MaterialButton regButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                showMessageOKCancel("La ubicación es necesaria para escanear dispositivos bluetooth",
-                        ((dialogInterface, i) -> requestPermission()));
-            } else {
-                requestPermission();
-            }
-        }
-        final TextInputLayout usernameInput = findViewById(R.id.username_input);
-        final TextInputEditText usernameEdit = findViewById(R.id.username_edit);
-        final TextInputLayout passwordInput = findViewById(R.id.password_input);
-        final TextInputEditText passwordEdit = findViewById(R.id.password_edit);
-        MaterialButton nextButton = findViewById(R.id.next_button_login);
-        MaterialButton regButton = findViewById(R.id.cancel_button_login);
 
+        //Comprobación de permisos
+        checkPermissions();
+
+        initialize();
+        listeners();
+    }
+
+    private void initialize() {
+        usernameInput = findViewById(R.id.username_input);
+        usernameEdit = findViewById(R.id.username_edit);
+        passwordInput = findViewById(R.id.password_input);
+        passwordEdit = findViewById(R.id.password_edit);
+        nextButton = findViewById(R.id.next_button_login);
+        regButton = findViewById(R.id.cancel_button_login);
+    }
+
+    private void listeners() {
         //Listener para escuchar cuando un usuario quiere registrarse
         regButton.setOnClickListener(view1 -> startActivity(new Intent(this, SignupActivity.class)));
 
@@ -72,14 +78,15 @@ public class LoginActivity extends AppCompatActivity {
                      */
                     Account account = db.getAccount(usernameEdit.getText().toString());
                     if (!account.getPassword().equals(passwordEdit.getText().toString())) {
+                        //Informamos al usuario en caso de ser incorrecto
                         Toast.makeText(this, "Usuario o contraseña incorrecta", Toast.LENGTH_SHORT).show();
                     }
                     else{
+                        //Guardamos el username para poder recurrir a el posteriormente en la app
                         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
                         SharedPreferences.Editor editor = preferences.edit();
                         editor.putString("username", usernameEdit.getText().toString());
                         editor.apply();
-                        //((NavigationHost) this).navigateTo(new SelectOBD(), false);
                         startActivity(new Intent(this, SelectObdActivity.class));
                     }
                 } catch (CursorIndexOutOfBoundsException e) {
@@ -103,17 +110,30 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void requestPermission() {
-        ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
-    }
+    private void checkPermissions() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                Helper.showMessageOKCancel(
+                        this,
+                        "La ubicación es necesaria para escanear dispositivos bluetooth",
+                        ((dialogInterface, i) -> Helper.requestPermission(this, Helper.REQUEST_LOCATION)));
+            } else {
+                Helper.requestPermission(this, Helper.REQUEST_LOCATION);
+            }
+        }
 
-    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(this)
-                .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .setNegativeButton("Cancel", null)
-                .create()
-                .show();
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+                Helper.showMessageOKCancel(
+                        this,
+                        "La camara es necesaria para detectar el cansancio",
+                        ((dialogInterface, i) -> Helper.requestPermission(this, Helper.REQUEST_CAMERA)));
+            } else {
+                Helper.requestPermission(this, Helper.REQUEST_CAMERA);
+            }
+        }
     }
 
     /**

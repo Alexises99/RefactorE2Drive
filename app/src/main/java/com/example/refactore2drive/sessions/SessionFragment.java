@@ -8,19 +8,13 @@ import android.content.pm.PackageManager;
 import android.database.CursorIndexOutOfBoundsException;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -31,9 +25,7 @@ import android.widget.Toast;
 import com.example.refactore2drive.Helper;
 import com.example.refactore2drive.MainActivity;
 import com.example.refactore2drive.R;
-import com.example.refactore2drive.activities.DeveloperModeActivity;
-import com.example.refactore2drive.activities.MoreInfoActivity;
-import com.example.refactore2drive.activities.UserConfigActivity;
+
 import com.example.refactore2drive.database.DatabaseHelper;
 import com.example.refactore2drive.models.Discapacity;
 import com.example.refactore2drive.models.Disease;
@@ -56,7 +48,6 @@ public class SessionFragment extends Fragment {
     private TextInputEditText commentEdit;
     private String username;
     private DatabaseHelper db;
-    public static final int REQUEST_EXTERNAL_STORAGE = 2000;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -147,7 +138,7 @@ public class SessionFragment extends Fragment {
     }
 
     private void requestPermission() {
-        ActivityCompat.requestPermissions(requireActivity(), new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_EXTERNAL_STORAGE);
+        ActivityCompat.requestPermissions(requireActivity(), new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, Helper.REQUET_STORAGE);
     }
 
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
@@ -158,6 +149,7 @@ public class SessionFragment extends Fragment {
                 .create()
                 .show();
     }
+
 
     private void createAlertDialog(SessionModel session, int i) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());

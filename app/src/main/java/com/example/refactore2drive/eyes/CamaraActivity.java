@@ -1,13 +1,16 @@
 package com.example.refactore2drive.eyes;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -16,6 +19,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.refactore2drive.Helper;
 import com.example.refactore2drive.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -43,6 +47,17 @@ public class CamaraActivity extends AppCompatActivity {
         setContentView(R.layout.activity_camara);
         mPreview = findViewById(R.id.preview1);
         mGraphicOverlay = findViewById(R.id.faceOverlay1);
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+                showMessageOKCancel(
+                        "La camara es necesaria para detectar el cansancio",
+                        ((dialogInterface, i) -> requestPermission())
+                );
+            } else {
+                requestPermission();
+            }
+        }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             createCameraSource();
         }
@@ -72,6 +87,19 @@ public class CamaraActivity extends AppCompatActivity {
         if (mCameraSource != null) {
             mCameraSource.release();
         }
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, Helper.REQUEST_CAMERA);
+    }
+
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(this)
+                .setMessage(message)
+                .setPositiveButton("Aceptar", okListener)
+                .setNegativeButton("Cancelar", null)
+                .create()
+                .show();
     }
 
     @NonNull

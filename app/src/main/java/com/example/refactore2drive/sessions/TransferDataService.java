@@ -72,7 +72,6 @@ public class TransferDataService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
             try{
-                //TODO arreglar sesiones
                 //Comienza las sesiones de ambos
                 odbSession = new Session(intent.getStringExtra("name"), intent.getStringArrayExtra("comment"),getApplicationContext().getFilesDir().getPath(),Headers.headersUnit,intent.getStringArrayExtra("data"));
                 String heart = intent.getStringExtra("name") + "Heart";

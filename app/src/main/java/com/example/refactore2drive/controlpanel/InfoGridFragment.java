@@ -8,9 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -18,9 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -30,12 +24,8 @@ import com.example.refactore2drive.Helper;
 import com.example.refactore2drive.MainActivity;
 import com.example.refactore2drive.MessageEventGrid;
 import com.example.refactore2drive.R;
-import com.example.refactore2drive.activities.DeveloperModeActivity;
-import com.example.refactore2drive.activities.MoreInfoActivity;
-import com.example.refactore2drive.activities.UserConfigActivity;
 import com.example.refactore2drive.chart.Value;
 import com.example.refactore2drive.database.DatabaseHelper;
-import com.example.refactore2drive.eyes.CamaraActivity;
 import com.example.refactore2drive.heart.BluetoothLeService;
 import com.example.refactore2drive.obd.BluetoothServiceOBD;
 import com.example.refactore2drive.obd.OBDConsumer;
@@ -57,32 +47,18 @@ public class InfoGridFragment extends Fragment {
     private DatabaseHelper db;
     private TextView statusObd, statusHeart;
     private String username;
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-    }
+    private RecyclerView recyclerView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_info_grid, container, false);
-        //setUpToolbar(view);
 
         //Inicialización de la vista
-        statusObd = view.findViewById(R.id.status_obd);
-        statusHeart = view.findViewById(R.id.status_heart);
+        initialize(view);
         statusHeart.setText(MainActivity.status);
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
-
         //Configuración del recycler view
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4, GridLayoutManager.VERTICAL, false));
-        //Inicialización de la lista
-        infoEntryList = InfoEntry.initList();
-        adapter = new InfoCardRecyclerViewAdapter(infoEntryList);
-        recyclerView.setAdapter(adapter);
-        recyclerView.addItemDecoration(new InfoGridItemDecoration(8,4));
+        configRecycler();
 
         return view;
     }
@@ -149,7 +125,21 @@ public class InfoGridFragment extends Fragment {
         }
     }
 
+    private void initialize(View view) {
+        statusObd = view.findViewById(R.id.status_obd);
+        statusHeart = view.findViewById(R.id.status_heart);
+        recyclerView = view.findViewById(R.id.recycler_view);
+    }
 
+    private void configRecycler() {
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4, GridLayoutManager.VERTICAL, false));
+        //Inicialización de la lista
+        infoEntryList = InfoEntry.initList();
+        adapter = new InfoCardRecyclerViewAdapter(infoEntryList);
+        recyclerView.setAdapter(adapter);
+        recyclerView.addItemDecoration(new InfoGridItemDecoration(8,4));
+    }
 
     /**
      * Este filtro se encarga de recibir los datos de la clase OBDConsumer y escuchar sus acciones

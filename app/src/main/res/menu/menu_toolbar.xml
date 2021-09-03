@@ -9,7 +9,7 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/search"
+        android:id="@+id/silence"
         android:icon="@drawable/ic_silence"
         android:title="Silenciar"
         app:showAsAction="always" />

@@ -7,8 +7,11 @@
     android:orientation="vertical" >
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/app_bar"
@@ -19,31 +22,39 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <com.example.refactore2drive.eyes.CameraSourcePreview
-        android:id="@+id/preview"
-        android:layout_width="150dp"
-        android:layout_height="150dp" >
-
-        <com.example.refactore2drive.eyes.GraphicOverlay
-            android:id="@+id/faceOverlay"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
-        </com.example.refactore2drive.eyes.GraphicOverlay>
-
-    </com.example.refactore2drive.eyes.CameraSourcePreview>
-
-    <FrameLayout
-        android:layout_alignParentTop="true"
-        android:layout_above="@+id/but_nav_layout"
-        android:id="@+id/container"
+    <RelativeLayout
+        android:id="@+id/rl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".MainActivity" />
+        android:layout_above="@+id/but_nav_layout"
+        android:layout_below="@+id/app_bar_layout">
+
+        <com.example.refactore2drive.eyes.CameraSourcePreview
+            android:id="@+id/preview"
+            android:layout_width="150dp"
+            android:layout_height="150dp" >
+
+            <com.example.refactore2drive.eyes.GraphicOverlay
+                android:id="@+id/faceOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+            </com.example.refactore2drive.eyes.GraphicOverlay>
+
+        </com.example.refactore2drive.eyes.CameraSourcePreview>
+
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".MainActivity" />
+
+    </RelativeLayout>
+
 
     <LinearLayout
         android:id="@+id/but_nav_layout"
-        android:layout_alignEnd="@id/container"
+        android:layout_alignEnd="@id/rl"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >

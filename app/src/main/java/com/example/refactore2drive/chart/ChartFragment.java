@@ -1,21 +1,15 @@
 package com.example.refactore2drive.chart;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -23,9 +17,6 @@ import android.widget.EditText;
 
 import com.example.refactore2drive.Helper;
 import com.example.refactore2drive.R;
-import com.example.refactore2drive.activities.DeveloperModeActivity;
-import com.example.refactore2drive.activities.MoreInfoActivity;
-import com.example.refactore2drive.activities.UserConfigActivity;
 import com.example.refactore2drive.database.DatabaseHelper;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;

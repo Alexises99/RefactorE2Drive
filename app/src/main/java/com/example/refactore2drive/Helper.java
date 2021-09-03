@@ -1,14 +1,24 @@
 package com.example.refactore2drive;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 
 import java.time.LocalTime;
 import java.util.HashMap;
 
 public class Helper {
 
+    public static final int REQUEST_CALL = 1000;
+    public static final int REQUEST_LOCATION = 2000;
+    public static final int REQUET_STORAGE = 3000;
+    public static final int REQUEST_CAMERA = 4000;
 
     public static int formatTime(LocalTime time) {
         int val;
@@ -59,6 +69,19 @@ public class Helper {
         String username = preferences.getString("username", "error");
         if (username.equals("error")) return "error";
         else return username;
+    }
+
+    public static void requestPermission(Activity activity, int code) {
+        ActivityCompat.requestPermissions(activity, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, code);
+    }
+
+    public static void showMessageOKCancel(Context context, String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(context)
+                .setMessage(message)
+                .setPositiveButton("Aceptar", okListener)
+                .setNegativeButton("Cancelar", null)
+                .create()
+                .show();
     }
 
 
