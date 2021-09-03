@@ -57,16 +57,12 @@ public class CallFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Aqui se indica que va a contener un menu, si no esta puesto nunca lo mostrara
-        setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_call, container, false);
-
-        setUpToolbar(view);
 
         RecyclerView recyclerView = view.findViewById(R.id.call_recycler);
         recyclerView.setHasFixedSize(true);
@@ -173,37 +169,4 @@ public class CallFragment extends Fragment {
         }
     };
 
-    /**
-     * Permite poner el actionbar
-     * @param view la vista actual
-     */
-    private void setUpToolbar(View view) {
-        Toolbar toolbar = view.findViewById(R.id.app_bar);
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        if (activity != null) {
-            activity.setSupportActionBar(toolbar);
-        }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater menuInflater) {
-        menuInflater.inflate(R.menu.menu_toolbar, menu);
-        super.onCreateOptionsMenu(menu, menuInflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int itemId = item.getItemId();
-        if (itemId == R.id.more_info) {
-            startActivity(new Intent(getActivity(), MoreInfoActivity.class));
-            return true;
-        } else if (itemId == R.id.settings) {
-            startActivity(new Intent(requireActivity(), UserConfigActivity.class));
-            return true;
-        } else if (itemId == R.id.developer_mode) {
-            startActivity(new Intent(requireActivity(), DeveloperModeActivity.class));
-            return true;
-        }
-        return false;
-    }
 }

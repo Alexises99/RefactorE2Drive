@@ -6,6 +6,19 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/app_bar"
+            style="@style/Widget.Shrine.Toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="E2Drive" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
     <com.example.refactore2drive.eyes.CameraSourcePreview
         android:id="@+id/preview"
         android:layout_width="150dp"

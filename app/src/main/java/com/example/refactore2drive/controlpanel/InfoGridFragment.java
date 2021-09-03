@@ -67,7 +67,7 @@ public class InfoGridFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_info_grid, container, false);
-        setUpToolbar(view);
+        //setUpToolbar(view);
 
         //Inicialización de la vista
         statusObd = view.findViewById(R.id.status_obd);
@@ -410,36 +410,4 @@ public class InfoGridFragment extends Fragment {
         }
     }
 
-    private void setUpToolbar(View view) {
-        Toolbar toolbar = view.findViewById(R.id.app_bar);
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        if (activity != null) {
-            activity.setSupportActionBar(toolbar);
-        }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater menuInflater) {
-        menuInflater.inflate(R.menu.menu_toolbar, menu);
-        super.onCreateOptionsMenu(menu, menuInflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int itemId = item.getItemId();
-        if (itemId == R.id.more_info) {
-            startActivity(new Intent(requireActivity(), MoreInfoActivity.class));
-            return true;
-        } else if (itemId == R.id.settings) {
-            startActivity(new Intent(requireActivity(), UserConfigActivity.class));
-            return true;
-        } else if (itemId == R.id.developer_mode) {
-            startActivity(new Intent(requireActivity(), DeveloperModeActivity.class));
-            return true;
-        } else if (itemId == R.id.camera) {
-            startActivity(new Intent(requireActivity(), CamaraActivity.class));
-            return true;
-        }
-        return false;
-    }
 }

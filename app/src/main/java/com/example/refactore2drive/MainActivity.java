@@ -2,6 +2,7 @@ package com.example.refactore2drive;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -25,9 +26,15 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.refactore2drive.activities.DeveloperModeActivity;
+import com.example.refactore2drive.activities.MoreInfoActivity;
+import com.example.refactore2drive.activities.UserConfigActivity;
 import com.example.refactore2drive.call.CallFragment;
 import com.example.refactore2drive.chart.ChartFragment;
 import com.example.refactore2drive.chart.Value;
@@ -79,7 +86,8 @@ public class MainActivity extends AppCompatActivity implements NavigationHost{
         mGraphicOverlay = findViewById(R.id.faceOverlay);
         mPreview.setVisibility(View.INVISIBLE);
         mGraphicOverlay.setVisibility(View.INVISIBLE);
-
+        Toolbar toolbar = findViewById(R.id.app_bar);
+        setSupportActionBar(toolbar);
         BottomNavigationView nav = findViewById(R.id.bottom_navigation);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             createCameraSource();
@@ -234,6 +242,28 @@ public class MainActivity extends AppCompatActivity implements NavigationHost{
                 return;
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.more_info) {
+            startActivity(new Intent(this, MoreInfoActivity.class));
+            return true;
+        } else if (itemId == R.id.settings) {
+            startActivity(new Intent(this, UserConfigActivity.class));
+            return true;
+        } else if (itemId == R.id.developer_mode) {
+            startActivity(new Intent(this, DeveloperModeActivity.class));
+            return true;
+        }
+        return false;
     }
 
     @Override

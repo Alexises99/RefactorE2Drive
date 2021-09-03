@@ -76,7 +76,7 @@ public class TransferDataService extends Service {
                 //Comienza las sesiones de ambos
                 odbSession = new Session(intent.getStringExtra("name"), intent.getStringArrayExtra("comment"),getApplicationContext().getFilesDir().getPath(),Headers.headersUnit,intent.getStringArrayExtra("data"));
                 String heart = intent.getStringExtra("name") + "Heart";
-                heartSession = new Session(heart + ".csv", intent.getStringArrayExtra("comment"),getApplicationContext().getFilesDir().getPath(),Headers.headersHeart,intent.getStringArrayExtra("data"));
+                heartSession = new Session(heart, intent.getStringArrayExtra("comment"),getApplicationContext().getFilesDir().getPath(),Headers.headersHeart,intent.getStringArrayExtra("data"));
             } catch (Session.ErrorSDException error) {
                 Log.d("ERRORSD", "SD NO INSERTADA");
                 close();
